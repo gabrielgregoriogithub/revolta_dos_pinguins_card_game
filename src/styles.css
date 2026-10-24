@@ -164,9 +164,11 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 /* ---- Palco da batalha: resolução fixa escalada para caber inteira na janela ---- */
 .stage-viewport{position:fixed;inset:0;overflow:hidden}
 .stage{position:absolute;left:50%;top:50%;transform-origin:50% 50%;display:grid;gap:0 16px;padding:10px 18px 0;overflow:hidden;max-width:none;margin:0}
-.stage.landscape{grid-template-columns:minmax(0,1fr) 320px;grid-template-rows:58px minmax(0,1fr)}
-.stage.portrait{grid-template-columns:minmax(0,1fr);grid-template-rows:58px minmax(0,1fr) 300px}
-.stage .topbar{grid-column:1/-1;margin:0;padding:0 0 8px}
+.stage.landscape{grid-template-columns:minmax(0,1fr) 320px;grid-template-rows:44px minmax(0,1fr)}
+.stage.portrait{grid-template-columns:minmax(0,1fr);grid-template-rows:44px minmax(0,1fr) 300px}
+.stage .topbar{grid-column:1/-1;margin:0;padding:0 0 6px}
+.stage .topbar .turn{font-size:15px}
+.stage .topbar button{padding:7px 12px}
 .stage .arena{display:grid;grid-template-rows:34px minmax(0,1fr) 62px minmax(0,1fr) 46px 196px;padding:10px 16px 0;border-radius:18px 18px 0 0;border-bottom:0;overflow:visible;min-height:0}
 .stage.portrait .arena{grid-template-rows:34px minmax(0,1fr) 62px minmax(0,1fr) 92px 236px}
 .stage .sidebar{min-height:0;overflow:hidden;padding-bottom:12px}
@@ -204,7 +206,7 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .stage.portrait .command-row .selection-preview{flex-basis:100%;order:-1}
 
 /* mão em leque, como se estivesse segurando as cartas */
-.hand{position:relative;border-top:0;padding:0;min-height:0}
+.hand{position:relative;z-index:12;border-top:0;padding:0;min-height:0}
 .hand-count{position:absolute;left:0;bottom:16px;z-index:30;padding:5px 10px;border-radius:10px;background:#071426dd;border:1px solid #34536c;font:700 12px var(--font-body);color:#a9d8ef}
 .hand-fan{position:absolute;left:50%;top:18px;transform:translateX(-50%);display:flex;justify-content:center}
 .fan-slot{position:relative;margin:0 -24px;transform-origin:50% 140%;transform:translateY(var(--fan-y)) rotate(var(--fan-rot));transition:transform .25s ease,margin .25s ease}
