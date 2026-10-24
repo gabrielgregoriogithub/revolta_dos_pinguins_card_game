@@ -1,0 +1,32 @@
+{
+  "name": "revolta-dos-pinguins-card-game",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "simulate": "tsx src/engine/simulator.ts",
+    "lint": "tsc --noEmit",
+    "server": "tsx src/server/server.ts",
+    "server:test": "vitest run src/tests/server.test.ts"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "latest",
+    "vite": "latest",
+    "typescript": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "vitest": "latest",
+    "tsx": "latest",
+    "jsdom": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "@types/node": "latest",
+    "ws": "latest",
+    "@types/ws": "latest"
+  },
+  "devDependencies": {}
+}
