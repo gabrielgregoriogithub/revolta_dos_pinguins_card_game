@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { CARDS, STARTER_DECKS, getCard } from '../data/cards';
-import { createGame, createReplay, damage, drawCard, endPreparation, getMatchStats, getPlayer, previewCard, sacrifice, summon, tacticalPreview, validateDeck } from '../engine/core';
+import { aiTurn, createGame, createReplay, damage, drawCard, endPreparation, getMatchStats, getPlayer, previewCard, sacrifice, summon, tacticalPreview, validateDeck } from '../engine/core';
 describe('motor de Revolta dos Pinguins', () => {
   it('valida os dois baralhos iniciais', () => { expect(validateDeck(STARTER_DECKS[0].cards)).toEqual([]); expect(validateDeck(STARTER_DECKS[1].cards)).toEqual([]); });
+  it('resolve automaticamente a vez inicial da IA', () => { const s = createGame(STARTER_DECKS[0].cards, STARTER_DECKS[1].cards, 'historia-ai-inicial'); s.activePlayerId = 'ai'; s.phase = 'PREPARATION'; aiTurn(s, 'normal'); expect(s.phase).toBe('PREPARATION'); expect(s.activePlayerId).toBe('player'); expect(s.eventLog.some(e => e.type === 'TURN_ENDED')).toBe(true); });
   it('retorna erro tipado para carta desconhecida sem lançar exceção', () => { expect(validateDeck(['missing-card'])).toContain('Cartas desconhecidas: missing-card.'); });
   it('cria mão inicial e mantém cristais válidos', () => { const s = createGame(STARTER_DECKS[0].cards, STARTER_DECKS[1].cards, 'teste'); expect(getPlayer(s,'player').hand).toHaveLength(5); expect(getPlayer(s,'player').crystals).toBe(3); });
   it('invoca, rejeita campo cheio e não permite cristal negativo', () => { const s = createGame(STARTER_DECKS[0].cards, STARTER_DECKS[1].cards, 'invocacao'); s.activePlayerId = 'player'; s.phase = 'PREPARATION'; const p = getPlayer(s); const monster = p.hand.find(id => getCard(id).category === 'monster' && getCard(id).cost <= p.crystals); if (monster) expect(summon(s,'player',monster)).toBeNull(); expect(p.crystals).toBeGreaterThanOrEqual(0); });

@@ -1,5 +1,16 @@
-# Relatório de performance
+# Relatório de performance — RC.1
 
-`npm.cmd run build` concluiu com bundle principal de aproximadamente 288 kB antes de gzip. A simulação de 1.000 partidas concluiu em ambiente local sem travamentos observados.
+## Verificações realizadas
 
-Ainda não há perfil em smartphones, métricas de memória, Lighthouse ou teste visual automatizado. Essas medições exigem navegador/dispositivo de teste e não devem ser inventadas.
+- Build Vite de produção concluído localmente.
+- Bundle de cliente gerado com os assets públicos.
+- Simulador e suíte do motor permanecem disponíveis pelos scripts do projeto.
+
+## Limitações
+
+Não há benchmark automatizado de FPS, memória, Lighthouse ou dispositivos móveis neste checkout. Também não há teste visual Playwright configurado. Não afirmar suporte de carga ou métricas de dispositivos reais sem executá-los.
+
+## Próximo passo
+
+Adicionar perfis de navegador para 360x800, 768x1024 e desktop; medir carregamento, memória e animações antes de um lançamento público.
+
