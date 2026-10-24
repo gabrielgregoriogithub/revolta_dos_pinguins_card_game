@@ -14,19 +14,20 @@
     "server:test": "vitest run src/tests/server.test.ts"
   },
   "dependencies": {
-    "@vitejs/plugin-react": "latest",
-    "vite": "latest",
-    "typescript": "latest",
-    "react": "latest",
-    "react-dom": "latest",
-    "vitest": "latest",
-    "tsx": "latest",
-    "jsdom": "latest",
+    "@fontsource/cinzel": "^5.3.0",
+    "@fontsource/nunito": "^5.3.0",
+    "@types/node": "latest",
     "@types/react": "latest",
     "@types/react-dom": "latest",
-    "@types/node": "latest",
-    "ws": "latest",
-    "@types/ws": "latest"
-  },
-  "devDependencies": {}
+    "@types/ws": "latest",
+    "@vitejs/plugin-react": "latest",
+    "jsdom": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "tsx": "latest",
+    "typescript": "latest",
+    "vite": "latest",
+    "vitest": "latest",
+    "ws": "latest"
+  }
 }

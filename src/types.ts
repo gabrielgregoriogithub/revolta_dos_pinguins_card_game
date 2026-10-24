@@ -42,8 +42,8 @@ export interface SurvivalRecord { bestStreak: number; attempts: number; totalBat
 export interface DraftSession { id: string; seed: string; picks: string[]; options: string[][]; status: 'DRAFTING'|'READY'|'ABANDONED'; deck: string[]; }
 export interface TournamentMatch { id: string; round: number; playerA: string | null; playerB: string | null; winner: string | null; status: 'PENDING'|'READY'|'PLAYING'|'COMPLETED'; }
 export interface Tournament { id: string; name: string; size: 4|8|16; status: 'REGISTRATION'|'IN_PROGRESS'|'COMPLETED'|'CANCELLED'; participants: string[]; matches: TournamentMatch[]; champion: string | null; }
-export type VisualEventType = 'START' | 'ATTACK' | 'DAMAGE' | 'BLOCK' | 'HEAL' | 'EFFECT' | 'DEATH' | 'FORMATION' | 'MISS' | 'END';
-export interface CombatVisualEvent { id: string; sequence: number; type: VisualEventType; sourceCardInstanceId?: string; targetCardInstanceId?: string; sourceModelId?: string; targetModelId?: string; attackType?: AttackType | string; damage?: number; healing?: number; blocked?: number; hpBefore?: number; hpAfter?: number; abilityId?: string; vfxId?: string; description: string; engineEvent: GameEvent; }
+export type VisualEventType = 'START' | 'ATTACK' | 'DAMAGE' | 'BLOCK' | 'HEAL' | 'EFFECT' | 'DEATH' | 'FORMATION' | 'MISS' | 'END' | 'SUMMON' | 'EQUIP' | 'STATUS';
+export interface CombatVisualEvent { id: string; sequence: number; type: VisualEventType; sourceCardInstanceId?: string; targetCardInstanceId?: string; sourceModelId?: string; targetModelId?: string; attackType?: AttackType | string; damage?: number; healing?: number; blocked?: number; hpBefore?: number; hpAfter?: number; abilityId?: string; value?: number; playerId?: string; cardId?: string; vfxId?: string; description: string; engineEvent: GameEvent; }
 export interface DeckList { id: string; name: string; cards: string[]; }
 
 export const FACTION_LABEL: Record<Faction, string> = { war: 'Guerra', nature: 'Natureza', balance: 'Equilíbrio', fortune: 'Fortuna', chaos: 'Caos', neutral: 'Neutra' };

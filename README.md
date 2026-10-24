@@ -13,7 +13,7 @@ npm run dev
 
 Validações disponíveis: `npm run typecheck`, `npm test`, `npm run build` e `npm run simulate -- --games 100`.
 
-O motor em `src/engine` não depende do React e trabalha com estado serializável, seed reproduzível e comandos validados. A interface é provisória e usa ícones/fundos CSS; o sistema de arte está separado por `CardArt`.
+O motor em `src/engine` não depende do React e trabalha com estado serializável, seed reproduzível e comandos validados. As cartas usam arte SVG procedural por carta (`src/app/CardArt.tsx`) até a entrada das artes finais; fontes Cinzel e Nunito são empacotadas localmente.
 
 ## Estrutura
 

@@ -15,4 +15,6 @@ Direção: fantasia medieval cartunesca, personagens expressivos, silhuetas leg�
 
 Raridades usam acabamento simples, brilho metálico, brilho ornamentado e halo luminoso respectivamente. O componente `CardView` recebe os dados da carta e aplica `data-faction`/`data-rarity`; nenhum atributo é duplicado em CSS por personagem.
 
-Tipografia: Barlow Condensed para títulos e atributos, Nunito para descrições e controles. A cor nunca é o único indicador: facção e raridade aparecem também como texto.
+Tipografia: Cinzel para títulos, nomes de carta e atributos; Nunito para descrições e controles. Ambas são servidas localmente via `@fontsource` (subconjunto latin, sem dependência do Google Fonts).
+
+Arte provisória: `src/app/CardArt.tsx` desenha em SVG um pinguim único por monstro (elmo, capuz, chapéu ou chifres + arma por classe, cenário por facção) e ícones próprios para equipamentos e feitiços. Quando um asset final for marcado como `ready` em `src/data/assets.ts`, a imagem substitui o SVG automaticamente. A cor nunca é o único indicador: facção e raridade aparecem também como texto.
