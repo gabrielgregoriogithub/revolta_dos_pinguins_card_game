@@ -15,6 +15,7 @@
 - Reprodução na própria tela de batalha: invocação animada, ataques distintos por tipo (golpe, flecha, orbe mágico, orbe caótico), linha de mira, alvo destacado e popup do efeito (dano, bloqueio, esquiva, cura, veneno, atordoamento, barreira, derrota).
 - Reprodução mais lenta (~1,5–1,9 s por evento; modo rápido pela metade).
 - Corrigido: monstros invocados não apareciam no campo durante a reprodução.
+- Ilustrações finais para os 24 monstros (recortadas das cartas de retrato, em webp, ~2 MB no total) e segunda carta-conceito (Pinguim Arqueiro) na tela inicial.
 
 ## 1.0.0-rc.1
 

@@ -1,4 +1,5 @@
 import { useId, type ReactElement } from 'react';
+import { CARD_ASSETS } from '../data/assets';
 import type { CardModel, Faction, MonsterCard } from '../types';
 
 type Weapon = 'sword' | 'axe' | 'hammer' | 'bow' | 'staff' | 'orb' | 'scythe' | 'shield';
@@ -127,6 +128,8 @@ export default function CardArt({ card }: { card: CardModel }) {
   const uid = useId().replace(/:/g, '');
   const [top, bottom] = SKY[card.faction];
   const glow = card.art.factionColor;
+  const asset = CARD_ASSETS[card.id];
+  if (asset?.status === 'ready') return <img className="card-art-img" src={asset.illustration} alt={card.name} loading="lazy" />;
   return <svg className="card-art-svg" viewBox="0 0 160 110" preserveAspectRatio="xMidYMid slice" role="img" aria-label={card.name}>
     <defs><linearGradient id={`sky${uid}`} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor={top} /><stop offset="1" stopColor={bottom} /></linearGradient></defs>
     <rect width="160" height="110" fill={`url(#sky${uid})`} />

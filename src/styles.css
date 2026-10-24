@@ -52,12 +52,11 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .hero h1{font-weight:900;letter-spacing:1px;line-height:.95;text-shadow:0 4px 0 #0a2238,0 10px 30px #000a}
 .hero h1 em{display:inline-block;background:linear-gradient(180deg,#fff6d0,#e9c46a 55%,#b07a1a);-webkit-background-clip:text;background-clip:text;color:transparent;text-shadow:none;filter:drop-shadow(0 4px 0 #3a2508) drop-shadow(0 0 22px #e9c46a66)}
 .showcase{position:relative;display:grid;place-items:center;min-height:540px}
-.showcase-hero{width:min(320px,70%);height:auto;border-radius:18px;box-shadow:0 30px 60px #000c,0 0 60px #4fb6e055;transform:rotate(2deg);animation:bob 6s ease-in-out infinite}
-.showcase-fan{position:absolute;inset:auto 0 4% 0;display:flex;justify-content:space-between;pointer-events:none}
-.showcase-fan .card{transform:rotate(-12deg) translateX(10%);box-shadow:0 20px 40px #000c}
-.showcase-fan .card+.card{transform:rotate(12deg) translateX(-10%)}
-@keyframes bob{50%{transform:rotate(2deg) translateY(-12px)}}
-@media(max-width:800px){.hero h1{font-size:44px}.showcase{min-height:380px;margin-top:20px}.showcase-hero{width:220px}.showcase-fan .card{scale:.75}.card{min-width:138px;width:138px}}
+.showcase-hero{grid-area:1/1;width:min(300px,60%);height:auto;border-radius:18px;box-shadow:0 30px 60px #000c,0 0 60px #4fb6e055;transform:translateX(-36%) rotate(-6deg);animation:bob 6s ease-in-out infinite;z-index:2}
+.showcase-hero.second{transform:translateX(40%) rotate(7deg);animation-name:bob2;animation-delay:-3s;z-index:1;box-shadow:0 30px 60px #000c,0 0 60px #4fbf7255}
+@keyframes bob2{50%{transform:translateX(40%) rotate(7deg) translateY(-12px)}}
+@keyframes bob{50%{transform:translateX(-36%) rotate(-6deg) translateY(-12px)}}
+@media(max-width:800px){.hero h1{font-size:44px}.showcase{min-height:380px;margin-top:20px}.showcase-hero{width:180px}.card{min-width:138px;width:138px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
 
 /* ---- Campo de batalha: a mesma carta da mão, com vida e status ao vivo ---- */
@@ -215,3 +214,4 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .fan-slot .card{box-shadow:-6px 8px 18px #0009}
 .hand-fan .card:disabled{opacity:.8;cursor:default}
 .stage .result-modal{position:absolute}
+.card-art-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:50% 30%;display:block}
