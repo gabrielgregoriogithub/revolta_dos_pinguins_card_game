@@ -1,4 +1,4 @@
-const CACHE_NAME = 'pinguins-rc-2';
+const CACHE_NAME = 'pinguins-rc-4-card-standard';
 const APP_SHELL = ['./', './index.html', './manifest.webmanifest', './icons/penguin.svg'];
 
 self.addEventListener('install', event => {

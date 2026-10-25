@@ -1,0 +1,11 @@
+.battle.biome-coast .arena{background:linear-gradient(180deg,#62c8e5,#1f6d85 56%,#19354a)}
+.battle.biome-canyon .arena{background:linear-gradient(155deg,#d1a05b,#8a4e3b 58%,#252330)}
+.battle.arena-coast-beach .arena{background-image:linear-gradient(#73d4ef66,#1b6c7e 58%,#dfc27d 59% 76%,#8c6747 77%)}
+.battle.arena-coast-ship .arena{background-image:linear-gradient(180deg,#6ebed866 0 48%,#17536f 49% 72%,#503a35 73% 100%)}
+.battle.arena-coast-port .arena,.battle.arena-coast-island .arena{background-image:radial-gradient(ellipse at 50% 75%,#d6bd70 0 20%,transparent 21%),linear-gradient(#72c9e0,#1f667b 60%,#263b43)}
+.battle.arena-village-square .arena{background-image:linear-gradient(180deg,#bfeeff,#7fb9d2 58%,#dcebf0 59% 74%,#7896a2 75%),radial-gradient(ellipse at 18% 72%,#d9f7ff 0 12%,transparent 13%),radial-gradient(ellipse at 82% 72%,#d9f7ff 0 14%,transparent 15%)}
+.battle.arena-village-training .arena{background-image:linear-gradient(180deg,#b3e7fb,#5f93af 55%,#6e8391 56% 100%),linear-gradient(90deg,#365b70 0 12%,transparent 13% 87%,#365b70 88%)}
+.battle.arena-glacier-cave .arena{background-image:radial-gradient(circle at 50% 28%,#d8fbff55 0 8%,transparent 28%),linear-gradient(145deg,#8fcad9,#28536d 58%,#172a40)}
+.story-map.map-biome-coast{background:radial-gradient(ellipse at 20% 76%,#58b7cf 0 15%,transparent 16%),linear-gradient(155deg,#21758a,#12334a 58%,#142332)}
+.story-map.map-biome-canyon{background:radial-gradient(ellipse at 30% 76%,#d5a052 0 18%,transparent 19%),linear-gradient(155deg,#9a5f3d,#382a31 65%,#1c2230)}
+.map-region strong{font-size:12px;text-align:center;color:#f6ce65}

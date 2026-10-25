@@ -1,7 +1,11 @@
+import type { FxPlan } from './vfx/choreography';
 export type Faction = 'war' | 'nature' | 'balance' | 'fortune' | 'chaos' | 'neutral';
 export type Rarity = 'common' | 'rare' | 'epic' | 'legendary';
 export type AttackType = 'melee' | 'ranged' | 'magic' | 'chaos';
 export type CardCategory = 'monster' | 'equipment' | 'effect';
+export type CreatureRace = 'penguin' | 'goblin' | 'orc' | 'troll' | 'skeleton' | 'dragon' | 'demon' | 'beast' | 'golem' | 'elemental' | 'other';
+export type CardOwnership = 'player' | 'enemy';
+export type CreatureClass = 'warrior' | 'archer' | 'mage' | 'paladin' | 'rogue' | 'samurai' | 'druid' | 'shaman' | 'necromancer' | 'tank' | 'support' | 'berserker' | 'monk' | 'engineer' | 'alchemist' | 'bard' | 'guardian' | 'chaos';
 export type GamePhase = 'INITIALIZATION' | 'PREPARATION' | 'COMBAT' | 'RESOLUTION' | 'TURN_END' | 'GAME_OVER';
 export type AbilityId = 'shield' | 'regeneration' | 'thorns' | 'counter' | 'flying' | 'doubleStrike' | 'reach' | 'reflect' | 'poison' | 'stun' | 'heal' | 'attackBuff' | 'armorBreak' | 'lifesteal' | 'taunt' | 'piercing' | 'silence' | 'cleanse' | 'barrier' | 'enrage' | 'summonBonus' | 'deathTrigger' | 'supportAura' | 'directDamage' | 'resource';
 
@@ -10,7 +14,7 @@ export interface Ability { id: AbilityId; name: string; description: string; val
 export interface CardArt { imagePath: string; fallbackIcon: string; factionColor: string; }
 export type CardTag = 'warrior' | 'archer' | 'mage' | 'nature' | 'poison' | 'healing' | 'defense' | 'sacrifice' | 'equipment' | 'magic' | 'chaos' | 'control' | 'support' | 'aggressive';
 export interface BaseCard { id: string; name: string; description: string; category: CardCategory; faction: Faction; rarity: Rarity; cost: number; art: CardArt; tags?: CardTag[]; }
-export interface MonsterCard extends BaseCard { category: 'monster'; level: number; maxHp: number; attacks: Attack[]; abilities: Ability[]; equipmentSlots: number; }
+export interface MonsterCard extends BaseCard { category: 'monster'; level: number; maxHp: number; attacks: Attack[]; abilities: Ability[]; equipmentSlots: number; ownership?: CardOwnership; race?: CreatureRace; classId?: CreatureClass; }
 export interface EquipmentCard extends BaseCard { category: 'equipment'; subtype: 'weapon' | 'armor' | 'shield' | 'staff' | 'amulet'; effects: Ability[]; attackModifier?: { attackType?: AttackType; value: number }; }
 export interface EffectCard extends BaseCard { category: 'effect'; effect: AbilityId; value: number; }
 export type CardModel = MonsterCard | EquipmentCard | EffectCard;
@@ -21,9 +25,14 @@ export interface GameState { gameId: string; seed: string; phase: GamePhase; act
 export interface MatchStats { turns: number; monstersSummoned: number; monstersLost: number; damageDealt: number; damageReceived: number; crystalsSpent: number; sacrifices: number; mostDamagingCard: string | null; mostUsedAbility: string | null; }
 export interface TacticalPreview { instanceId: string; cardId: string; name: string; position: number; canAttack: boolean; attackType: AttackType; baseDamage: number; estimatedDamage: string; targetName: string | null; reason: string; }
 export interface GameReplay { version: string; seed: string; decks: [string[], string[]]; events: GameEvent[]; finalState: GameState; }
-export interface CampaignBattle { id: string; regionId: string; name: string; kind: 'normal' | 'elite' | 'boss'; difficulty: 'easy'|'normal'|'hard'; enemyDeckId: string; enemyName: string; description: string; reward: { gold: number; shards: number; cardId?: string }; }
-export interface CampaignRegion { id: string; name: string; theme: string; description: string; enemyStyle: string; battles: CampaignBattle[]; unlockAfter?: string; }
-export interface CampaignSave { version: number; unlockedRegions: string[]; completedBattles: string[]; claimedRewards: string[]; unlockedCards: string[]; gold: number; shards: number; cardLevels: Record<string, number>; achievements: string[]; }
+export type CampaignNodeType = 'battle' | 'elite' | 'boss' | 'reward' | 'secret';
+export interface CampaignReward { gold: number; shards: number; cardId?: string; evolution?: string; }
+export interface CampaignBattle { id: string; regionId: string; name: string; kind: 'normal' | 'elite' | 'boss'; difficulty: 'easy'|'normal'|'hard'; enemyDeckId: string; enemyName: string; description: string; reward: CampaignReward; environmentId?: string; worldIndex?: number; stageIndex?: number; optional?: boolean; }
+export interface CampaignRegion { id: string; name: string; theme: string; description: string; enemyStyle: string; battles: CampaignBattle[]; unlockAfter?: string; worldIndex?: number; mapBackgroundId?: string; }
+export interface CampaignNode { id: string; regionId: string; stageId: string; x: number; y: number; type: CampaignNodeType; connections: string[]; unlockConditions: CampaignUnlockCondition[]; rewards: CampaignReward[]; environmentId: string; secret?: boolean; }
+export type CampaignUnlockCondition = { type: 'completed' | 'card' | 'achievement' | 'secret'; id: string };
+export interface CampaignSave { version: number; unlockedRegions: string[]; completedBattles: string[]; claimedRewards: string[]; unlockedCards: string[]; gold: number; shards: number; cardLevels: Record<string, number>; achievements: string[]; storyDeck: string[]; currentNodeId: string; discoveredNodes: string[]; discoveredSecrets: string[]; }
+export interface BattleEnvironment { id: string; biomeId: string; name: string; backgroundImage: string; mapBackgroundId?: string; battleBackgroundId?: string; battleVariantId?: string; foregroundImage?: string; particleEffect?: 'leaves' | 'snow' | 'ash' | 'mist' | 'embers' | 'dust' | 'runes' | 'none'; lightingPreset: string; }
 export type RankedResult = 'WIN'|'LOSS'|'DRAW'|'CANCELLED';
 export interface League { id: string; name: string; minRating: number; maxRating: number | null; color: string; }
 export interface CompetitiveProfile { playerId: string; rating: number; peakRating: number; wins: number; losses: number; draws: number; placementMatches: number; updatedAt: string; }
@@ -43,7 +52,7 @@ export interface DraftSession { id: string; seed: string; picks: string[]; optio
 export interface TournamentMatch { id: string; round: number; playerA: string | null; playerB: string | null; winner: string | null; status: 'PENDING'|'READY'|'PLAYING'|'COMPLETED'; }
 export interface Tournament { id: string; name: string; size: 4|8|16; status: 'REGISTRATION'|'IN_PROGRESS'|'COMPLETED'|'CANCELLED'; participants: string[]; matches: TournamentMatch[]; champion: string | null; }
 export type VisualEventType = 'START' | 'ATTACK' | 'DAMAGE' | 'BLOCK' | 'HEAL' | 'EFFECT' | 'DEATH' | 'FORMATION' | 'MISS' | 'END' | 'SUMMON' | 'EQUIP' | 'STATUS';
-export interface CombatVisualEvent { id: string; sequence: number; type: VisualEventType; sourceCardInstanceId?: string; targetCardInstanceId?: string; sourceModelId?: string; targetModelId?: string; attackType?: AttackType | string; damage?: number; healing?: number; blocked?: number; hpBefore?: number; hpAfter?: number; abilityId?: string; value?: number; playerId?: string; cardId?: string; vfxId?: string; description: string; engineEvent: GameEvent; }
+export interface CombatVisualEvent { id: string; sequence: number; type: VisualEventType; sourceCardInstanceId?: string; targetCardInstanceId?: string; sourceModelId?: string; targetModelId?: string; attackType?: AttackType | string; damage?: number; healing?: number; blocked?: number; hpBefore?: number; hpAfter?: number; abilityId?: string; value?: number; playerId?: string; cardId?: string; vfxId?: string; fxProfileId?: string; hitStopMs?: number; shakeIntensity?: number; description: string; engineEvent: GameEvent; fx?: FxPlan; }
 export interface DeckList { id: string; name: string; cards: string[]; }
 
 export const FACTION_LABEL: Record<Faction, string> = { war: 'Guerra', nature: 'Natureza', balance: 'Equilíbrio', fortune: 'Fortuna', chaos: 'Caos', neutral: 'Neutra' };

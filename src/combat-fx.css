@@ -1,0 +1,268 @@
+/* Linguagem visual de combate — camada carregada por último.
+   Tempos vêm da coreografia (src/vfx/choreography.ts) via --windup-ms, --travel-ms, --impact-delay e --hitstop.
+   Só anima transform, opacity, filter e clip-path para manter o desempenho em celulares. */
+
+/* Paleta por elemento: --fx (principal), --fx2 (núcleo/brilho) e --flash (clarão sobre a carta).
+   Classe dobrada para vencer as cores antigas por tipo de ataque (.attack-fx.fx-magic etc.). */
+.el-physical.el-physical{--fx:#ffe2a6;--fx2:#ffffff;--flash:#fff6d8}
+.el-fire.el-fire{--fx:#ff6a2b;--fx2:#ffd54d;--flash:#ff8a3d}
+.el-ice.el-ice{--fx:#7fe3ff;--fx2:#e9fbff;--flash:#9fe9ff}
+.el-lightning.el-lightning{--fx:#ffe14a;--fx2:#fffbe0;--flash:#fff27a}
+.el-poison.el-poison{--fx:#6fe04a;--fx2:#d9ff9e;--flash:#7dff5a}
+.el-shadow.el-shadow{--fx:#a35cff;--fx2:#e3c7ff;--flash:#8c3cff}
+.el-nature.el-nature{--fx:#58e08c;--fx2:#e4ffb0;--flash:#7cf0a8}
+.el-light.el-light{--fx:#ffd76a;--fx2:#fffbe8;--flash:#ffe9a0}
+.el-arcane.el-arcane{--fx:#8f8bff;--fx2:#e6e4ff;--flash:#b3a8ff}
+.el-chaos.el-chaos{--fx:#ef5bff;--fx2:#ffd6ff;--flash:#e05bff}
+.react-light{--react-scale:.8;--recoil:4px;--tilt:1deg}.react-medium{--react-scale:1;--recoil:8px;--tilt:2.5deg}.react-heavy{--react-scale:1.25;--recoil:13px;--tilt:4deg}.react-boss{--react-scale:1.5;--recoil:18px;--tilt:6deg}
+.formation.enemy{--recoil-dir:-1}.formation.own{--recoil-dir:1}
+
+/* A arena só treme com chefes; o tremor genérico antigo de todo dano foi desligado. */
+.arena.combat-event-damage,.arena.combat-event-block,.arena.combat-event-death{animation:none}
+.arena.fx-shake-arena,.lab-arena.fx-shake-arena{animation:fx-arena-shake .42s ease-out .11s both}
+@keyframes fx-arena-shake{0%,100%{transform:translate(0)}15%{transform:translate(-7px,3px)}30%{transform:translate(6px,-4px)}45%{transform:translate(-4px,2px)}60%{transform:translate(3px,-1px)}80%{transform:translate(-1px,1px)}}
+
+/* ---------- Atacante: preparação e investida ---------- */
+.formation .slot.fx-attacker .card{outline:3px solid var(--fx,#f6ce65);outline-offset:3px;animation:fx-windup var(--windup-ms) ease-out both,fx-lunge var(--travel-ms) cubic-bezier(.55,0,.4,1) var(--windup-ms) forwards}
+@keyframes fx-windup{0%{transform:none;filter:none}100%{transform:translate(calc(var(--dx,0px) * -.12),calc(var(--dy,0px) * -.12)) scale(1.04) rotate(calc(var(--slash-angle) * -.12));filter:brightness(1.18) drop-shadow(0 0 12px var(--fx))}}
+@keyframes fx-lunge{0%{transform:translate(calc(var(--dx,0px) * -.12),calc(var(--dy,0px) * -.12)) scale(1.04)}65%{transform:translate(var(--dx,0px),var(--dy,0px)) scale(1.1) rotate(calc(var(--slash-angle) * .15));filter:brightness(1.25)}100%{transform:translate(calc(var(--dx,0px) * .55),calc(var(--dy,0px) * .55)) scale(1.04)}}
+/* Distância e magia não avançam: puxam a corda / canalizam e recuam no disparo. */
+.formation .slot.fx-attacker:is(.motion-projectile,.motion-bolt,.motion-breath) .card{animation:fx-channel var(--windup-ms) ease-in both,fx-release var(--travel-ms) ease-out var(--windup-ms) forwards}
+@keyframes fx-channel{0%{transform:none;filter:none}100%{transform:scale(.95) translateY(4px);filter:brightness(1.3) drop-shadow(0 0 16px var(--fx))}}
+@keyframes fx-release{0%{transform:scale(1.07) translateY(-6px);filter:brightness(1.5) drop-shadow(0 0 22px var(--fx))}100%{transform:none;filter:none}}
+.formation .slot.fx-attacker.fx-boss .card{outline-width:4px;outline-color:#ffcf4a}
+.formation .slot.fx-attacker.fx-strike-2::after{content:'2º GOLPE';position:absolute;z-index:12;top:-6px;left:50%;transform:translateX(-50%);padding:3px 8px;border-radius:99px;background:#0b1726ee;border:1px solid var(--fx,#f6ce65);color:#fff;font:900 11px var(--font-body);letter-spacing:.08em;white-space:nowrap}
+
+/* ---------- Trajetória no palco ---------- */
+.attack-fx{--fx:#f6ce65;filter:none}
+.attack-fx .windup{position:absolute;left:var(--x1);top:var(--y1);opacity:0;animation:fx-charge var(--windup-ms) ease-in both}
+.attack-fx .windup i{position:absolute;width:70px;height:70px;border:3px solid var(--fx);border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 0 18px var(--fx),inset 0 0 14px var(--fx)}
+.attack-fx .windup i:nth-child(2){width:34px;height:34px;background:radial-gradient(circle,var(--fx2),transparent 70%);border:0}
+.attack-fx.is-boss .windup i:first-child{width:130px;height:130px;border-width:5px}
+@keyframes fx-charge{0%{opacity:0;transform:scale(1.6)}70%{opacity:1;transform:scale(.7)}100%{opacity:0;transform:scale(.4)}}
+/* Sem filtros em SVG: drop-shadow sobre SVGs do tamanho da arena trava o renderizador do Chrome. */
+.attack-fx .aim-line line{stroke:var(--fx);filter:none;animation:fx-aim calc(var(--windup-ms) + var(--travel-ms)) ease both}
+@keyframes fx-aim{0%{opacity:0}35%{opacity:.45}100%{opacity:0}}
+.attack-fx.is-boss::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 35%,#0009 100%);animation:fx-vignette calc(var(--windup-ms) + var(--travel-ms)) ease both}
+@keyframes fx-vignette{0%,100%{opacity:0}30%,80%{opacity:1}}
+
+.attack-fx .projectile{position:absolute;left:var(--x1);top:var(--y1);opacity:0;animation:fx-fly var(--travel-ms) cubic-bezier(.35,0,.85,.6) var(--windup-ms) both}
+@keyframes fx-fly{0%{opacity:1;transform:translate(-50%,-50%) scale(.6)}12%{opacity:1;transform:translate(calc(-50% + var(--dx) * .1),calc(-50% + var(--dy) * .1)) scale(1)}100%{opacity:1;transform:translate(calc(-50% + var(--dx)),calc(-50% + var(--dy))) scale(1.05)}}
+.attack-fx .projectile i,.attack-fx .projectile b,.attack-fx .projectile em{position:absolute;left:0;top:0;display:block;transform:translate(-50%,-50%) rotate(var(--angle))}
+/* Rastro: faixa que se estende para trás do projétil, na cor do elemento. */
+.attack-fx .projectile b{width:90px;height:8px;border-radius:99px;transform:translate(-100%,-50%) rotate(var(--angle));transform-origin:100% 50%;background:linear-gradient(90deg,transparent,var(--fx) 70%,var(--fx2));opacity:.75;filter:blur(1px)}
+.attack-fx .projectile em{width:26px;height:26px;border-radius:50%;background:radial-gradient(circle,var(--fx2),var(--fx) 45%,transparent 72%);opacity:.8}
+.attack-fx .shape-arrow i{width:58px;height:4px;border-radius:2px;background:linear-gradient(90deg,#f4f8fc 0 14%,#8a5528 14% 86%,var(--fx) 86%);box-shadow:0 0 8px var(--fx);transform:translate(-50%,-50%) rotate(var(--angle))}
+.attack-fx .shape-arrow i::after{content:'';position:absolute;right:-10px;top:-6px;border:8px solid transparent;border-left:12px solid var(--fx2);filter:drop-shadow(0 0 4px var(--fx))}
+.attack-fx .shape-arrow i::before{content:'';position:absolute;left:-2px;top:-5px;width:12px;height:14px;background:linear-gradient(135deg,var(--fx) 50%,transparent 50%);opacity:.9}
+.attack-fx .shape-arrow em{display:none}
+.attack-fx.el-physical .shape-arrow b{height:3px;opacity:.35}
+.attack-fx .shape-orb i{width:34px;height:34px;border-radius:50%;background:radial-gradient(circle at 40% 40%,#fff 0 14%,var(--fx2) 24%,var(--fx) 52%,transparent 72%);box-shadow:0 0 26px 10px color-mix(in srgb,var(--fx) 60%,transparent);animation:fx-orb .16s ease-in-out infinite alternate}
+.attack-fx.el-fire .shape-orb b{height:18px;background:linear-gradient(90deg,transparent,#ff3d1f 40%,#ff9a2b 75%,#ffe27a);filter:blur(2px)}
+@keyframes fx-orb{to{transform:translate(-50%,-50%) scale(1.18)}}
+.attack-fx .shape-shard i{width:40px;height:16px;background:linear-gradient(90deg,#2c7fd6,var(--fx) 40%,#fff);clip-path:polygon(0 50%,30% 0,100% 50%,30% 100%);filter:drop-shadow(0 0 8px var(--fx))}
+.attack-fx .shape-leaf i{width:26px;height:14px;border-radius:0 100% 0 100%;background:linear-gradient(135deg,#d4ff8a,var(--fx));box-shadow:0 0 12px var(--fx);animation:fx-spin .3s linear infinite}
+.attack-fx .shape-skull i{width:32px;height:32px;border-radius:50% 50% 42% 42%;background:radial-gradient(circle at 35% 45%,#160a24 0 12%,transparent 13%),radial-gradient(circle at 65% 45%,#160a24 0 12%,transparent 13%),radial-gradient(circle,var(--fx2),var(--fx) 60%,#3a1460);box-shadow:0 0 22px 8px color-mix(in srgb,var(--fx) 55%,transparent)}
+.attack-fx .shape-vortex i{width:34px;height:34px;border-radius:50%;background:conic-gradient(var(--fx),#2a1645,var(--fx2),#2a1645,var(--fx));box-shadow:0 0 24px 8px color-mix(in srgb,var(--fx) 55%,transparent);animation:fx-spin .3s linear infinite}
+.attack-fx .shape-spark i{width:30px;height:30px;background:radial-gradient(circle,#fff 0 18%,var(--fx2) 30%,transparent 62%);clip-path:polygon(50% 0,60% 40%,100% 50%,60% 60%,50% 100%,40% 60%,0 50%,40% 40%);filter:drop-shadow(0 0 10px var(--fx));animation:fx-spin .5s linear infinite}
+@keyframes fx-spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+/* Raio: zigue-zague revelado ao longo do eixo. */
+.attack-fx .bolt-path{position:absolute;width:1px;height:1px;overflow:visible;transform:rotate(var(--angle));transform-origin:0 0}
+.attack-fx .bolt-path polyline{fill:none;stroke:var(--fx2);stroke-width:4;stroke-linejoin:round;stroke-dasharray:var(--len);stroke-dashoffset:var(--len);animation:fx-bolt var(--travel-ms) linear var(--windup-ms) both,fx-flicker 70ms steps(2) var(--windup-ms) infinite}
+@keyframes fx-bolt{to{stroke-dashoffset:0}}
+.attack-fx .bolt-path polyline.glow{stroke:var(--fx);stroke-width:14;opacity:.45}
+@keyframes fx-flicker{50%{opacity:.55}}
+/* Sopro de chefe: cone que cresce da origem até o alvo. */
+.attack-fx .breath-cone{position:absolute;left:var(--x1);top:var(--y1);width:var(--len);height:110px;transform:translateY(-50%) rotate(var(--angle));transform-origin:0 50%;pointer-events:none}
+.attack-fx .breath-cone i{position:absolute;inset:0;clip-path:polygon(0 42%,100% 0,100% 100%,0 58%);background:linear-gradient(90deg,var(--fx2),var(--fx) 40%,color-mix(in srgb,var(--fx) 40%,transparent));opacity:0;transform-origin:0 50%;animation:fx-breath var(--travel-ms) ease-out var(--windup-ms) both}
+.attack-fx .breath-cone i:nth-child(2){inset:18% 0;animation-delay:calc(var(--windup-ms) + 40ms);mix-blend-mode:screen}
+.attack-fx .breath-cone i:nth-child(3){inset:32% 0;background:linear-gradient(90deg,#fff,var(--fx2));animation-delay:calc(var(--windup-ms) + 80ms)}
+@keyframes fx-breath{0%{opacity:0;transform:scaleX(0)}25%{opacity:.95}100%{opacity:.85;transform:scaleX(1)}}
+
+/* ---------- Golpe corpo a corpo sobre o alvo (no contato) ---------- */
+.melee-swipe{position:absolute;left:var(--x2);top:var(--y2);width:0;height:0;pointer-events:none;--hit-at:calc(var(--windup-ms) + var(--travel-ms) * .55)}
+.melee-swipe i{position:absolute;left:0;top:0;opacity:0;animation:fx-swipe .34s ease-out var(--hit-at) both}
+@keyframes fx-swipe{0%{opacity:0;clip-path:inset(0 100% 0 0)}30%{opacity:1;clip-path:inset(0 0 0 0)}65%{opacity:1}100%{opacity:0;clip-path:inset(0 0 0 0)}}
+.melee-swipe.motion-slash i,.melee-swipe.motion-heavy i,.melee-swipe.motion-quick i{width:240px;height:240px;margin:-26px 0 0 -120px;transform-origin:50% 26px;border-radius:50%;border-top:13px solid #fff;border-left:5px solid transparent;border-right:5px solid transparent;filter:drop-shadow(0 0 4px var(--fx)) drop-shadow(0 0 14px var(--fx)) drop-shadow(0 0 2px #fff);transform:rotate(calc(var(--slash-angle) - 20deg))}
+.melee-swipe.motion-heavy i{border-top-width:20px;border-top-color:#ffb36b;filter:drop-shadow(0 0 10px #ff7a2f)}
+.melee-swipe.motion-quick i{border-top-width:5px;animation-duration:.18s}
+.melee-swipe.motion-quick i:nth-child(2){transform:rotate(calc(var(--slash-angle) * -1 + 160deg));animation-delay:calc(var(--hit-at) + 70ms)}
+.melee-swipe.motion-thrust i{width:150px;height:10px;margin:-5px 0 0 -75px;border-radius:99px;background:linear-gradient(90deg,transparent,var(--fx) 40%,#fff);box-shadow:0 0 14px var(--fx);transform:rotate(-90deg);animation-name:fx-thrust}
+@keyframes fx-thrust{0%{opacity:0;transform:rotate(-90deg) scaleX(.1) translateX(60px)}40%{opacity:1;transform:rotate(-90deg) scaleX(1)}100%{opacity:0;transform:rotate(-90deg) scaleX(1.1) translateX(-20px)}}
+.melee-swipe.motion-smash i{width:120px;height:120px;margin:-60px 0 0 -60px;border-radius:50%;border:8px solid var(--fx2);box-shadow:0 0 20px var(--fx),inset 0 0 18px var(--fx);animation-name:fx-smash;animation-duration:.34s}
+@keyframes fx-smash{0%{opacity:0;transform:translateY(-70px) scale(.25)}35%{opacity:1;transform:translateY(0) scale(.45)}100%{opacity:0;transform:scale(1.55)}}
+.melee-swipe.motion-claw i{width:16px;height:130px;margin:-65px 0 0 -8px;border-radius:99px;background:linear-gradient(180deg,transparent,#fff 30%,var(--fx) 60%,transparent);filter:drop-shadow(0 0 6px var(--fx));transform:rotate(28deg)}
+.melee-swipe.motion-claw i:nth-child(1){margin-left:-36px}.melee-swipe.motion-claw i:nth-child(3){margin-left:20px}
+.melee-swipe.motion-claw i:nth-child(2){animation-delay:calc(var(--hit-at) + 40ms)}.melee-swipe.motion-claw i:nth-child(3){animation-delay:calc(var(--hit-at) + 80ms)}
+.melee-swipe.motion-bite i{width:120px;height:60px;margin-left:-60px;border:0;border-radius:50% 50% 0 0;background:repeating-conic-gradient(from 90deg at 50% 100%,#fff 0 7deg,transparent 7deg 18deg);filter:drop-shadow(0 0 6px var(--fx));animation-name:fx-bite-top;animation-duration:.24s}
+.melee-swipe.motion-bite i:nth-child(1){margin-top:-74px}
+.melee-swipe.motion-bite i:nth-child(2){margin-top:14px;transform:scaleY(-1);animation-name:fx-bite-bottom}
+@keyframes fx-bite-top{0%{opacity:0;transform:translateY(-26px)}60%{opacity:1;transform:translateY(14px)}100%{opacity:0;transform:translateY(14px)}}
+@keyframes fx-bite-bottom{0%{opacity:0;transform:scaleY(-1) translateY(-26px)}60%{opacity:1;transform:scaleY(-1) translateY(14px)}100%{opacity:0;transform:scaleY(-1) translateY(14px)}}
+.melee-swipe.motion-fist i{width:90px;height:90px;margin:-45px 0 0 -45px;background:radial-gradient(circle,#fff 0 18%,var(--fx2) 30%,transparent 62%);clip-path:polygon(50% 0,61% 35%,98% 35%,68% 57%,79% 91%,50% 70%,21% 91%,32% 57%,2% 35%,39% 35%);animation-name:fx-burst}
+@keyframes fx-burst{0%{opacity:0;transform:scale(.2)}40%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.3) rotate(20deg)}}
+
+/* ---------- Impacto: clarão, anel, raios, partículas e proteção ---------- */
+.impact-fx{position:absolute;left:50%;top:50%;z-index:11;width:0;height:0;pointer-events:none;transform:scale(var(--react-scale,1))}
+.impact-fx>span{position:absolute;left:0;top:0}
+.impact-core{width:120px;height:120px;margin:-60px 0 0 -60px;border-radius:50%;background:radial-gradient(circle,#fff 0 12%,var(--fx2) 26%,var(--fx) 48%,transparent 70%);opacity:0;animation:fx-core .32s ease-out var(--impact-delay) both}
+@keyframes fx-core{0%{opacity:0;transform:scale(.25)}18%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.35)}}
+.impact-ring{width:150px;height:150px;margin:-75px 0 0 -75px;border-radius:50%;border:5px solid var(--fx);box-shadow:0 0 16px var(--fx);opacity:0;animation:fx-ring .48s ease-out calc(var(--impact-delay) + 30ms) both}
+@keyframes fx-ring{0%{opacity:.95;transform:scale(.2)}100%{opacity:0;transform:scale(1.25)}}
+.impact-rays i{position:absolute;left:0;top:0;width:130px;height:6px;margin:-3px 0 0 -65px;border-radius:99px;background:linear-gradient(90deg,transparent,var(--fx2),transparent);opacity:0;animation:fx-ray .3s ease-out var(--impact-delay) both}
+.impact-rays i:nth-child(2){transform:rotate(45deg)}.impact-rays i:nth-child(3){transform:rotate(90deg)}.impact-rays i:nth-child(4){transform:rotate(135deg)}
+@keyframes fx-ray{0%{opacity:1;clip-path:inset(0 45%)}100%{opacity:0;clip-path:inset(0 0)}}
+.fx-particles{position:absolute;left:0;top:0}
+.fx-particles i{position:absolute;left:0;top:0;width:var(--s);height:var(--s);margin:calc(var(--s) / -2) 0 0 calc(var(--s) / -2);border-radius:50%;background:var(--fx2);box-shadow:0 0 6px var(--fx);opacity:0;animation:fx-particle .55s cubic-bezier(.15,.7,.3,1) calc(var(--impact-delay, 0ms) + var(--pd)) both}
+@keyframes fx-particle{0%{opacity:1;transform:rotate(var(--a)) translateX(4px) scale(1)}100%{opacity:0;transform:rotate(var(--a)) translateX(var(--d)) scale(.3)}}
+/* Variações de partícula por elemento: brasas, estilhaços, bolhas, folhas e faíscas. */
+.el-fire .fx-particles i{background:#ffd54d;box-shadow:0 0 8px #ff5a1f}
+.el-ice .fx-particles i{border-radius:2px;background:linear-gradient(135deg,#fff,#7fe3ff);transform-origin:center;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)}
+.el-poison .fx-particles i{background:radial-gradient(circle at 35% 35%,#eaffc0,#5fd23a 60%);box-shadow:none}
+.el-nature .fx-particles i{border-radius:0 100% 0 100%;background:#9cf27a}
+.el-lightning .fx-particles i{border-radius:1px;width:2px;height:calc(var(--s) * 2.2);background:#fffbe0;box-shadow:0 0 6px #ffe14a}
+.el-physical .fx-particles i{border-radius:1px;width:3px;background:#fff}
+.el-fire .impact-core{background:radial-gradient(circle,#fff 0 10%,#ffe27a 22%,#ff7a2f 44%,#c42a12 58%,transparent 72%)}
+.el-fire .impact-ring{border-color:#5a3a32aa;box-shadow:none;filter:blur(2px)}
+.el-ice .impact-ring{border-style:dotted;border-width:6px}
+.el-shadow .impact-ring,.el-arcane .impact-ring{border-style:dashed;animation-name:fx-ring-rune}
+@keyframes fx-ring-rune{0%{opacity:.95;transform:scale(.2) rotate(0)}100%{opacity:0;transform:scale(1.25) rotate(90deg)}}
+.el-light .impact-rays i{height:10px}.el-light .impact-core{background:radial-gradient(circle,#fff 0 18%,#fff2b8 34%,#ffd76a 52%,transparent 72%)}
+.el-lightning .impact-rays i{animation:fx-ray .3s steps(3) var(--impact-delay) both}
+/* Proteção: escudo que segura (absorvido/bloqueado), é atravessado (perfuração) ou racha (ruptura). */
+.impact-shield{width:86px;height:96px;margin:-48px 0 0 -43px;border-radius:44% 44% 50% 50%/30% 30% 70% 70%;border:4px solid #a8e1ff;background:radial-gradient(circle at 40% 30%,#ffffff55,#4aa8e033 60%);box-shadow:0 0 18px #6cc8ff,inset 0 0 14px #6cc8ff88;opacity:0;animation:fx-shield .5s ease-out var(--impact-delay) both}
+@keyframes fx-shield{0%{opacity:0;transform:scale(.6)}25%{opacity:1;transform:scale(1.08)}45%{transform:scale(.96)}100%{opacity:0;transform:scale(1.02)}}
+.impact-shield b{display:none}
+.impact-fx.pierce .impact-shield::after{content:'';position:absolute;left:50%;top:-30px;width:6px;height:150px;margin-left:-3px;border-radius:99px;background:linear-gradient(180deg,transparent,#fff,var(--fx));box-shadow:0 0 10px var(--fx);transform:rotate(-30deg)}
+.impact-fx.shatter .impact-shield{animation-name:fx-shield-break}
+.impact-fx.shatter .impact-shield b{display:block;position:absolute;left:50%;top:50%;width:26px;height:30px;background:#bfe9ff;clip-path:polygon(0 0,100% 20%,60% 100%);opacity:0;animation:fx-shard .5s ease-out calc(var(--impact-delay) + 120ms) both}
+.impact-fx.shatter .impact-shield b:nth-child(2){--sx:-46px;--sy:30px;--r:-120deg}.impact-fx.shatter .impact-shield b:nth-child(1){--sx:44px;--sy:-24px;--r:140deg}.impact-fx.shatter .impact-shield b:nth-child(3){--sx:10px;--sy:52px;--r:80deg}
+@keyframes fx-shield-break{0%{opacity:0;transform:scale(.6)}25%{opacity:1;transform:scale(1.05)}40%{opacity:1;filter:brightness(1.6)}55%,100%{opacity:0;transform:scale(1.15)}}
+@keyframes fx-shard{0%{opacity:1;transform:translate(-50%,-50%)}100%{opacity:0;transform:translate(calc(-50% + var(--sx)),calc(-50% + var(--sy))) rotate(var(--r))}}
+
+/* ---------- Reação da carta atingida: hit stop (clarão congelado) e recuo ---------- */
+.formation .slot.fx-hit .card{animation:fx-hitstop var(--hitstop) steps(1) var(--impact-delay) both,fx-recoil .38s cubic-bezier(.2,.8,.3,1) calc(var(--impact-delay) + var(--hitstop)) both}
+@keyframes fx-hitstop{0%,100%{filter:brightness(1.9) saturate(.6)}}
+@keyframes fx-recoil{0%{transform:none}22%{transform:translate(calc(var(--recoil) * .6),calc(var(--recoil) * var(--recoil-dir,1))) rotate(var(--tilt));filter:brightness(1.25)}55%{transform:translate(calc(var(--recoil) * -.3),calc(var(--recoil) * var(--recoil-dir,1) * -.25)) rotate(calc(var(--tilt) * -.5))}100%{transform:none;filter:none}}
+.formation .slot.fx-hit .card::after{content:'';position:absolute;inset:0;z-index:4;border-radius:11px;pointer-events:none;background:var(--flash,#fff);mix-blend-mode:screen;opacity:0;animation:fx-flash .26s ease-out var(--impact-delay) both}
+@keyframes fx-flash{0%{opacity:.75}100%{opacity:0}}
+.formation .slot.fx-hit.num-absorbed .card,.formation .slot.fx-hit.num-blocked .card{animation:fx-hitstop var(--hitstop) steps(1) var(--impact-delay) both,fx-brace .3s ease-out calc(var(--impact-delay) + var(--hitstop)) both}
+.formation .slot.fx-hit.num-absorbed .card::after,.formation .slot.fx-hit.num-blocked .card::after{background:#8fd7ff}
+@keyframes fx-brace{0%{transform:none}30%{transform:scale(.97)}100%{transform:none}}
+.formation .slot.fx-targeted::before{content:none}
+.formation .slot.fx-targeted .card{animation:none;outline:3px solid #ff5a5a;outline-offset:3px;box-shadow:0 0 20px #ff5a5a66}
+
+/* ---------- Números de resultado ---------- */
+.formation .fx-popup{top:34%;padding:0;background:none;border:0;box-shadow:none;gap:4px;animation:fx-num calc(var(--event-ms) - var(--impact-delay,0ms)) cubic-bezier(.2,.9,.3,1) calc(var(--impact-delay,0ms) + var(--hitstop,0ms)) both}
+.formation .fx-popup b{font:900 44px/1 var(--font-display);color:#fff;-webkit-text-stroke:2px #3a0a0a;paint-order:stroke fill;text-shadow:0 3px 0 #0009,0 0 16px var(--num-glow,#ff4040)}
+.formation .fx-popup small{padding:3px 8px;border-radius:99px;background:#071321e6;border:1px solid var(--num-glow,#ff4040);color:#fff;font:900 10px var(--font-body);letter-spacing:.08em}
+@keyframes fx-num{0%{opacity:0;transform:translate(-50%,-30%) scale(.4)}14%{opacity:1;transform:translate(-50%,-50%) scale(1.25)}26%{transform:translate(-50%,-52%) scale(1)}78%{opacity:1;transform:translate(-50%,-85%)}100%{opacity:0;transform:translate(-50%,-105%)}}
+.fx-popup.damage{--num-glow:#ff4040}.fx-popup.damage b{color:#fff}
+.fx-popup.num-fire{--num-glow:#ff7a2f}.fx-popup.num-fire b{color:#ffd27a}
+.fx-popup.num-ice{--num-glow:#5fd7ff}.fx-popup.num-ice b{color:#dff8ff;-webkit-text-stroke-color:#0b3a5e}
+.fx-popup.num-lightning{--num-glow:#ffe14a}.fx-popup.num-lightning b{color:#fffbd0;-webkit-text-stroke-color:#5e4a00}
+.fx-popup.num-poison{--num-glow:#6fe04a}.fx-popup.num-poison b{color:#d9ff9e;-webkit-text-stroke-color:#1d4a0b}
+.fx-popup.num-shadow,.fx-popup.num-chaos{--num-glow:#b35cff}.fx-popup.num-shadow b,.fx-popup.num-chaos b{color:#ecd6ff;-webkit-text-stroke-color:#2e0d4f}
+.fx-popup.num-arcane,.fx-popup.num-reflect{--num-glow:#9f8bff}.fx-popup.num-arcane b,.fx-popup.num-reflect b{color:#e6e4ff;-webkit-text-stroke-color:#1f1a5e}
+.fx-popup.num-light{--num-glow:#ffd76a}.fx-popup.num-light b{color:#fff6cf;-webkit-text-stroke-color:#5e4300}
+.fx-popup.num-nature,.fx-popup.num-thorns{--num-glow:#58e08c}.fx-popup.num-nature b,.fx-popup.num-thorns b{color:#d6ffe6;-webkit-text-stroke-color:#0b4a25}
+.fx-popup.react-heavy b{font-size:54px}.fx-popup.react-boss b{font-size:62px;color:#ffe08a;-webkit-text-stroke-color:#5e2a00}
+.fx-popup.react-light b{font-size:36px}
+.formation .fx-popup.heal{--num-glow:#69e49a}.formation .fx-popup.heal b{color:#b6ffd0;-webkit-text-stroke-color:#0b4a25}
+.formation .fx-popup.drain{--num-glow:#ff5a7a}.formation .fx-popup.drain b{color:#ffd0dc;-webkit-text-stroke-color:#4a0b1d}
+.formation .fx-popup.absorbed{--num-glow:#6cc8ff}.formation .fx-popup.absorbed b{font-size:34px;color:#cfeeff;-webkit-text-stroke-color:#0b3a5e}
+.formation .fx-popup.blocked{--num-glow:#c2ccd6}.formation .fx-popup.blocked b{color:#e8eef4;-webkit-text-stroke-color:#2a3440}
+.formation .fx-popup.miss{--num-glow:#d9e9f2}.formation .fx-popup.miss b{font-size:30px;font-style:italic;letter-spacing:.06em;color:#fff;-webkit-text-stroke-color:#1a2a3a}
+.formation .fx-popup.status b,.formation .fx-popup.buff b,.formation .fx-popup.summon b{font-size:26px}
+.formation .fx-popup.death{--num-glow:#ff5a5a}.formation .fx-popup.death b{font-size:38px}
+
+/* ---------- Esquiva, cura, dreno e status ---------- */
+.formation .slot.fx-hit-miss .card{animation:fx-dodge .45s cubic-bezier(.2,.8,.3,1) both}
+@keyframes fx-dodge{0%{transform:none}35%{transform:translateX(42px) rotate(7deg);opacity:.7}100%{transform:none;opacity:1}}
+.miss-fx i{position:absolute;left:10%;top:40%;width:80%;height:4px;border-radius:99px;background:linear-gradient(90deg,transparent,#fff,transparent);opacity:0;animation:fx-whoosh .35s ease-out both}
+.miss-fx i:nth-child(2){top:56%;animation-delay:60ms}
+@keyframes fx-whoosh{0%{opacity:.9;transform:translateX(-40px) scaleX(.3)}100%{opacity:0;transform:translateX(60px) scaleX(1)}}
+.heal-fx,.status-fx,.death-fx,.miss-fx{position:absolute;inset:0;z-index:11;pointer-events:none}
+.heal-fx{--fx:#69e49a;--fx2:#d6ffe6}.heal-fx.drain{--fx:#ff5a7a;--fx2:#ffd0dc}
+.heal-fx .fx-particles,.status-fx .fx-particles{left:50%;top:70%}
+.fx-particles.rising i{animation-name:fx-rise;animation-duration:.8s}
+@keyframes fx-rise{0%{opacity:0;transform:translate(calc(cos(var(--a)) * 30px),0) scale(.6)}25%{opacity:1}100%{opacity:0;transform:translate(calc(cos(var(--a)) * 40px),calc(var(--d) * -1.4)) scale(1)}}
+.formation .slot.fx-hit-heal .card{animation:fx-heal .7s ease var(--impact-delay) both}
+@keyframes fx-heal{30%{filter:brightness(1.3) drop-shadow(0 0 16px var(--heal,#69e49a));transform:scale(1.04)}100%{filter:none;transform:none}}
+.status-fx.st-poison{--fx:#6fe04a;--fx2:#d9ff9e}.status-fx.st-buff{--fx:#ff8a2b;--fx2:#ffd54d}.status-fx.st-cleanse{--fx:#fff;--fx2:#dff6ff}.status-fx.st-barrier{--fx:#6cc8ff;--fx2:#dff6ff}.status-fx.st-stun{--fx:#ffe25b;--fx2:#fff6c0}.status-fx.st-freeze{--fx:#7fe3ff;--fx2:#fff}
+.status-fx.st-stun::before{content:'✦ ✦ ✦';position:absolute;left:50%;top:6%;color:#ffe25b;font-size:22px;letter-spacing:8px;text-shadow:0 0 8px #ffb000;animation:fx-stars .9s linear infinite}
+@keyframes fx-stars{0%{transform:translateX(-50%) rotate(0) scaleX(1)}50%{transform:translateX(-50%) scaleX(-1)}100%{transform:translateX(-50%) scaleX(1)}}
+.status-fx.st-barrier::before{content:'';position:absolute;inset:-6px;border-radius:18px;border:3px solid #8fd7ff;box-shadow:0 0 22px #6cc8ff,inset 0 0 22px #6cc8ff88;animation:fx-bubble .7s ease-out both}
+@keyframes fx-bubble{0%{opacity:0;transform:scale(.8)}40%{opacity:1;transform:scale(1.04)}100%{opacity:.0;transform:scale(1)}}
+/* Congelamento: camada de gelo sobre a arte, deixando cabeçalho e atributos legíveis. */
+.frost-layer{position:absolute;left:8%;right:8%;top:30%;bottom:28%;border-radius:10px;background:linear-gradient(160deg,#ffffffcc,#bff1ff99 35%,#7fd8ff55 70%,#ffffff88),repeating-linear-gradient(60deg,transparent 0 14px,#ffffff66 14px 16px);box-shadow:inset 0 0 18px #fff,0 0 14px #7fe3ff;clip-path:polygon(4% 8%,22% 0,48% 6%,74% 0,96% 10%,100% 46%,94% 92%,62% 100%,30% 94%,0 100%,3% 52%);animation:fx-frost .9s ease-out both}
+@keyframes fx-frost{0%{opacity:0;transform:scale(.85)}30%{opacity:1;transform:scale(1)}80%{opacity:.9}100%{opacity:.6}}
+.formation .slot.st-freeze .card{animation:fx-freeze-tint .9s ease both}
+@keyframes fx-freeze-tint{40%,100%{filter:saturate(.6) hue-rotate(-10deg) brightness(1.12)}}
+.formation .slot.st-poison .card{animation:fx-poison-tint .8s ease both}
+@keyframes fx-poison-tint{40%{filter:drop-shadow(0 0 14px #6fe04a) hue-rotate(40deg) saturate(1.2)}100%{filter:none}}
+/* Aura persistente enquanto houver veneno ativo. */
+.card[data-poisoned]{box-shadow:0 0 0 2px #6fe04a88,0 0 18px #6fe04a66,0 10px 24px #0009;animation:fx-poison-aura 2.2s ease-in-out infinite}
+@keyframes fx-poison-aura{50%{box-shadow:0 0 0 2px #6fe04acc,0 0 26px #6fe04a99,0 10px 24px #0009}}
+.card[data-stunned] .card-art{filter:saturate(.75) brightness(.92)}
+
+/* ---------- Vínculos: reflexão, espinhos (contra-ataque) e roubo de vida ---------- */
+.link-fx{--fx:#9f8bff;--fx2:#fff}.link-fx.link-thorns{--fx:#58e08c;--fx2:#eaffc0}.link-fx.link-drain{--fx:#ff5a7a;--fx2:#ffd0dc}
+.link-fx .link-trail{position:absolute;left:var(--x1);top:var(--y1);width:var(--len);height:4px;margin-top:-2px;border-radius:99px;transform:rotate(var(--angle));transform-origin:0 50%;background:linear-gradient(90deg,var(--fx2),var(--fx),transparent);opacity:0;animation:fx-link-trail var(--impact-delay) ease-out both}
+@keyframes fx-link-trail{0%{opacity:0;clip-path:inset(0 100% 0 0)}40%{opacity:.8}100%{opacity:0;clip-path:inset(0 0 0 0)}}
+.link-fx .link-orb{position:absolute;left:var(--x1);top:var(--y1);width:22px;height:22px;margin:-11px 0 0 -11px;border-radius:50%;background:radial-gradient(circle,#fff 0 18%,var(--fx2) 32%,var(--fx) 58%,transparent 72%);box-shadow:0 0 16px var(--fx);opacity:0;animation:fx-link-orb var(--impact-delay) cubic-bezier(.4,0,.6,1) calc(var(--i) * 55ms) both}
+.link-fx.link-thorns .link-orb{border-radius:2px;width:26px;height:10px;background:linear-gradient(90deg,#3b2a12,#58e08c);clip-path:polygon(0 0,100% 50%,0 100%,20% 50%);transform:rotate(var(--angle))}
+@keyframes fx-link-orb{0%{opacity:0;transform:translate(0,0) scale(.5)}15%{opacity:1}90%{opacity:1;transform:translate(var(--dx),var(--dy)) scale(1)}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(.4)}}
+.formation .slot.fx-link-source.link-reflect .card{animation:fx-reflect-wave .45s ease-out both}
+@keyframes fx-reflect-wave{0%{filter:none}30%{filter:brightness(1.5) drop-shadow(0 0 20px #9f8bff)}100%{filter:none}}
+.formation .slot.fx-link-source.link-thorns .card{animation:fx-thorns-snap .3s ease-out both}
+@keyframes fx-thorns-snap{40%{transform:scale(1.05);filter:drop-shadow(0 0 14px #58e08c)}100%{transform:none;filter:none}}
+.formation .slot.fx-link-source.link-drain .card{animation:fx-drain-out .5s ease-out both}
+@keyframes fx-drain-out{40%{filter:saturate(.4) brightness(.8) drop-shadow(0 0 14px #ff5a7a)}100%{filter:none}}
+
+/* ---------- Destruição conforme a causa ---------- */
+.formation .slot .card.defeated{opacity:0;transition:opacity .2s}
+.formation .slot.fx-death .card{animation:fx-die-physical var(--event-ms) ease-in both}
+.formation .slot.fx-death.el-fire .card{animation-name:fx-die-fire}
+.formation .slot.fx-death.el-ice .card{animation-name:fx-die-ice}
+.formation .slot.fx-death.el-lightning .card{animation-name:fx-die-lightning}
+.formation .slot.fx-death.el-poison .card,.formation .slot.fx-death.el-nature .card{animation-name:fx-die-poison}
+.formation .slot.fx-death:is(.el-shadow,.el-chaos,.el-arcane,.el-light) .card{animation-name:fx-die-shadow}
+@keyframes fx-die-physical{0%{opacity:1;transform:none;filter:none}12%{transform:translateX(-6px) rotate(-2deg);filter:brightness(1.6)}24%{transform:translateX(5px) rotate(1deg)}55%{opacity:1;transform:none;filter:grayscale(.6)}100%{opacity:0;transform:translateY(26px) scale(.86) rotate(-4deg);filter:grayscale(1)}}
+@keyframes fx-die-fire{0%{opacity:1;filter:none;clip-path:inset(0 0 0 0)}25%{filter:brightness(1.5) sepia(.8) saturate(3) hue-rotate(-20deg)}100%{opacity:.2;filter:brightness(.4) sepia(1);clip-path:inset(0 0 100% 0)}}
+@keyframes fx-die-ice{0%{opacity:1;filter:none;transform:none}40%{filter:saturate(.3) brightness(1.5) hue-rotate(160deg);transform:scale(1.03)}65%{opacity:1;transform:scale(1.03)}100%{opacity:0;transform:scale(1.12);filter:brightness(2.2) saturate(0)}}
+@keyframes fx-die-lightning{0%,20%,40%{opacity:1;filter:brightness(2.4)}10%,30%{opacity:.4;filter:brightness(.6)}60%{opacity:1;filter:brightness(1.2) grayscale(.5)}100%{opacity:0;filter:brightness(3) grayscale(1)}}
+@keyframes fx-die-poison{0%{opacity:1;filter:none;transform:none}40%{filter:hue-rotate(70deg) saturate(1.4) brightness(.9)}100%{opacity:0;filter:hue-rotate(90deg) saturate(.5);transform:translateY(16px) scale(.9)}}
+@keyframes fx-die-shadow{0%{opacity:1;filter:none;transform:none}40%{filter:saturate(.3) brightness(.7) drop-shadow(0 0 18px var(--fx))}100%{opacity:0;transform:scale(.7) rotate(8deg);filter:brightness(.3) saturate(0)}}
+.death-fx .fx-particles{left:50%;top:50%}
+.death-fx .fx-particles.death i{animation:fx-particle .9s cubic-bezier(.15,.7,.3,1) calc(var(--event-ms) * .45 + var(--pd)) both}
+.death-fx.el-fire .fx-particles.death i{animation-name:fx-rise}
+.death-cracks{position:absolute;inset:6%;width:88%;height:88%;overflow:visible}
+.death-cracks path{fill:none;stroke:#fff;stroke-width:2.6;stroke-linecap:round;stroke-dasharray:260;stroke-dashoffset:260;animation:fx-crack calc(var(--event-ms) * .35) ease-out calc(var(--event-ms) * .12) forwards}
+@keyframes fx-crack{to{stroke-dashoffset:0}}
+
+/* ---------- Níveis de qualidade e movimento reduzido ---------- */
+.fxq-low .impact-ring,.fxq-low .attack-fx .projectile b,.fxq-low .attack-fx.is-boss::before,.fxq-low .death-cracks{display:none}
+.fxq-low .formation .slot.fx-hit .card{animation:fx-hitstop var(--hitstop) steps(1) var(--impact-delay) both}
+.fxq-medium .attack-fx .projectile em,.fxq-medium .attack-fx.is-boss::before{display:none}
+@media (prefers-reduced-motion:reduce){
+  .formation .slot.fx-attacker .card,.formation .slot.fx-hit .card,.formation .slot.fx-hit-miss .card,.formation .slot.fx-death .card,.arena.fx-shake-arena,.lab-arena.fx-shake-arena{animation:none}
+  .formation .slot.fx-death .card{opacity:.25}
+  .attack-fx .projectile,.attack-fx .breath-cone,.melee-swipe,.fx-particles,.link-fx .link-orb{display:none}
+  .formation .fx-popup{animation:fx-num-fade calc(var(--event-ms)) ease both}
+  @keyframes fx-num-fade{0%,100%{opacity:0;transform:translate(-50%,-50%)}15%,80%{opacity:1;transform:translate(-50%,-50%)}}
+  .card[data-poisoned]{animation:none}
+}
+
+/* ---------- Laboratório de efeitos (?lab) ---------- */
+.lab-arena{position:relative;isolation:isolate;display:grid;grid-template-rows:1fr auto 1fr;gap:10px;min-height:560px;padding:46px 20px 20px;border-radius:18px;background:radial-gradient(circle at 50% 45%,#284c6c,#0b1d30 70%);border:1px solid #315675;overflow:hidden}
+.lab-arena .formation{display:flex;justify-content:center;gap:22px;min-height:250px}
+.lab-arena .slot,.lab-arena .slot.empty{width:150px}.lab-arena .formation .card,.lab-arena .slot.empty{zoom:.78}.lab-arena .formation{min-height:215px}
+.lab-arena .slot.empty{opacity:.25}
+.lab-caption{display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 14px;border-radius:12px;background:#071321cc;border:1px solid #f6ce6566;text-align:center}
+.lab-caption b{color:#f6ce65;font:900 15px var(--font-display)}.lab-caption span{color:#d6e6f2;font-size:12px}
+.lab-empty{align-self:center;justify-self:center;grid-row:1 / -1;color:#a9c7d8}
+.lab-stage{display:flex!important;flex-direction:column;gap:12px;place-items:stretch!important}
+.lab-group h3{margin:6px 0 6px;color:#f6ce65;font:900 13px var(--font-display);letter-spacing:.06em;text-transform:uppercase}
+.lab-buttons{display:flex;flex-wrap:wrap;gap:6px}.lab-buttons button{padding:6px 10px;font-size:12px}
+.lab-controls{max-height:calc(100vh - 140px);overflow-y:auto}
