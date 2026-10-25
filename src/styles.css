@@ -205,6 +205,7 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .stage.portrait .command-row{flex-wrap:wrap}
 .stage.portrait .command-row .selection-preview{flex-basis:100%;order:-1}
 @media(max-width:520px){.stage.portrait .topbar{gap:5px}.stage.portrait .topbar .turn{font-size:11px;letter-spacing:1px}.stage.portrait .top-controls{gap:4px}.stage.portrait .top-controls span{display:none}.stage.portrait .top-controls button{padding:6px 8px;font-size:11px}.stage.portrait .command-row{gap:5px}.stage.portrait .command-row button{padding:8px 7px;font-size:11px}.stage.portrait .hand-fan{top:10px}.stage.portrait .fan-slot{margin:0 -28px}.stage.portrait .fan-slot:hover,.stage.portrait .fan-slot.selected{margin:0 4px}}
+.slot.empty[role="button"]{cursor:pointer;touch-action:manipulation;user-select:none}.slot.empty[role="button"]:focus-visible{outline:2px solid #ffe48a;outline-offset:4px}.slot-hint{display:block;color:#f6ce65;font-size:9px;text-align:center;padding:3px 6px;border:1px solid #f6ce6588;border-radius:999px;background:#071426cc}
 
 /* mão em leque, como se estivesse segurando as cartas */
 .hand{position:relative;z-index:12;border-top:0;padding:0;min-height:0}

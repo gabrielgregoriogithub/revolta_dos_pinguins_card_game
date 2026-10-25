@@ -42,8 +42,8 @@ function useRowShake(rowRef: RefObject<HTMLDivElement | null>, event: CombatVisu
   }, [event?.id]);
 }
 
-type RowProps = { player: PlayerState; enemy?: boolean; event?: CombatVisualEvent; speed?: PlaybackSpeed; quality?: FxQuality; selectedId?: string | null; onSelect?: (id: string | null) => void; onDropCard?: (cardId: string, targetId?: string) => void; onInspectCard?: (cardId: string) => void };
-export function FormationRow({ player, enemy = false, event, speed = 'normal', quality = 'high', selectedId, onSelect, onDropCard, onInspectCard }: RowProps) {
+type RowProps = { player: PlayerState; enemy?: boolean; event?: CombatVisualEvent; speed?: PlaybackSpeed; quality?: FxQuality; selectedId?: string | null; selectedCardId?: string | null; onSelect?: (id: string | null) => void; onSlotClick?: (position: number) => void; onDropCard?: (cardId: string, targetId?: string) => void; onInspectCard?: (cardId: string) => void };
+export function FormationRow({ player, enemy = false, event, speed = 'normal', quality = 'high', selectedId, selectedCardId, onSelect, onSlotClick, onDropCard, onInspectCard }: RowProps) {
   const allowDrop = (dropEvent: DragEvent<HTMLElement>) => { if (onDropCard) dropEvent.preventDefault(); };
   const drop = (dropEvent: DragEvent<HTMLElement>, targetId?: string) => { if (!onDropCard) return; dropEvent.preventDefault(); const cardId = dropEvent.dataTransfer.getData('text/card-id'); if (cardId) onDropCard(cardId, targetId); };
   const rowRef = useFormationAdvance(player.battlefield);
@@ -51,7 +51,7 @@ export function FormationRow({ player, enemy = false, event, speed = 'normal', q
   const timing = fxTimingVars(event?.fx, speed);
   return <div ref={rowRef} className={`formation ${enemy ? 'enemy' : 'own'}`} onDragOver={allowDrop} onDrop={dropEvent => drop(dropEvent)}>{[0, 1, 2].map(i => {
     const unit = player.battlefield[i];
-    if (!unit) return <div className="slot empty" data-pos={i + 1} key={`empty-${i}`}><span>+</span><small>{i + 1}ª posição</small></div>;
+    if (!unit) return <div className="slot empty" data-pos={i + 1} key={`empty-${i}`} role={onSlotClick ? 'button' : undefined} tabIndex={onSlotClick ? 0 : undefined} aria-label={onSlotClick ? `Colocar carta na ${i + 1}ª posição` : undefined} onClick={onSlotClick ? () => onSlotClick(i + 1) : undefined} onKeyDown={onSlotClick ? keyEvent => { if (keyEvent.key === 'Enter' || keyEvent.key === ' ') onSlotClick(i + 1); } : undefined}><span>+</span><small>{i + 1}ª posição</small>{onSlotClick && selectedCardId && <b className="slot-hint">Toque para colocar</b>}</div>;
     const role = slotRole(event, unit.instanceId);
     const popup = popupFor(event, unit.instanceId);
     // Re-keying on each event the card takes part in restarts its CSS animation.
