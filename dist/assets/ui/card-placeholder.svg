@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 800" role="img" aria-labelledby="title desc">
+  <title id="title">Ilustração provisória</title>
+  <desc id="desc">Placeholder original para cartas sem arte final.</desc>
+  <defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#173b62"/><stop offset="1" stop-color="#071426"/></linearGradient></defs>
+  <rect width="600" height="800" rx="32" fill="url(#bg)"/>
+  <path d="M300 140c-96 0-160 77-160 174 0 139 74 234 160 234s160-95 160-234c0-97-64-174-160-174z" fill="#183850" stroke="#70c7ef" stroke-width="10"/>
+  <circle cx="245" cy="300" r="18" fill="#f7f1df"/><circle cx="355" cy="300" r="18" fill="#f7f1df"/>
+  <circle cx="245" cy="300" r="8" fill="#071426"/><circle cx="355" cy="300" r="8" fill="#071426"/>
+  <path d="M260 350h80l-40 42z" fill="#f6a23a"/>
+  <path d="M190 460c44 38 176 38 220 0" fill="none" stroke="#f7f1df" stroke-width="22" stroke-linecap="round"/>
+  <text x="300" y="690" text-anchor="middle" fill="#a9d8ef" font-family="Arial, sans-serif" font-size="30" font-weight="700">ARTE PROVISÓRIA</text>
+</svg>
