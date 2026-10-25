@@ -1,6 +1,6 @@
 import type { FxPlan } from './vfx/choreography';
 export type Faction = 'war' | 'nature' | 'balance' | 'fortune' | 'chaos' | 'neutral';
-export type Rarity = 'common' | 'rare' | 'epic' | 'legendary';
+export type Rarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
 export type AttackType = 'melee' | 'ranged' | 'magic' | 'chaos';
 export type CardCategory = 'monster' | 'equipment' | 'effect';
 export type CreatureRace = 'penguin' | 'goblin' | 'orc' | 'troll' | 'skeleton' | 'dragon' | 'demon' | 'beast' | 'golem' | 'elemental' | 'other';
@@ -56,5 +56,5 @@ export interface CombatVisualEvent { id: string; sequence: number; type: VisualE
 export interface DeckList { id: string; name: string; cards: string[]; }
 
 export const FACTION_LABEL: Record<Faction, string> = { war: 'Guerra', nature: 'Natureza', balance: 'Equilíbrio', fortune: 'Fortuna', chaos: 'Caos', neutral: 'Neutra' };
-export const RARITY_LABEL: Record<Rarity, string> = { common: 'Comum', rare: 'Rara', epic: 'Épica', legendary: 'Lendária' };
+export const RARITY_LABEL: Record<Rarity, string> = { common: 'Comum', uncommon: 'Incomum', rare: 'Rara', epic: 'Épica', legendary: 'Lendária' };
 export const ATTACK_LABEL: Record<AttackType, string> = { melee: 'Corpo a corpo', ranged: 'Distância', magic: 'Magia', chaos: 'Caos' };

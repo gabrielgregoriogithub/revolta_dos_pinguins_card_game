@@ -1,4 +1,5 @@
 import type { Ability, CardModel, DeckList, Faction, CreatureClass, CreatureRace, MonsterCard } from '../types';
+import { EXPANSION_CARDS, EXPANSION_ENEMY_CARDS } from './expansion';
 
 const art = (faction: Faction, icon: string) => ({ imagePath: '', fallbackIcon: icon, factionColor: ({ war: '#e24a4a', nature: '#43b87a', balance: '#4b9de8', fortune: '#d7ae42', chaos: '#a75bd1', neutral: '#8290a4' } as Record<Faction, string>)[faction] });
 const ability = (id: Ability['id'], name: string, description: string, value?: number, duration?: number): Ability => ({ id, name, description, value, duration });
@@ -58,6 +59,8 @@ CARDS.push(
   effect('chaos_relic', 'Relíquia do Caos', 'Concede +1 ou +3 dano de forma reproduzível.', 'chaos', 2, 'attackBuff', 2),
   effect('resource_surge', 'Surto de Fortuna', 'Concede +1 cristal sem ultrapassar o limite.', 'fortune', 1, 'resource', 1)
 );
+// A expansão é composta após o catálogo-base para preservar IDs, decks e saves antigos.
+CARDS.push(...EXPANSION_CARDS);
 const PLAYER_NAMES: Record<string, string> = { orc_warrior: 'Pinguim Guerreiro', iron_knight: 'Pinguim Cavaleiro', berserker: 'Pinguim Berserker', stone_golem: 'Pinguim Guardião', elven_archer: 'Pinguim Arqueiro', goblin_hunter: 'Pinguim Caçador', forest_scout: 'Pinguim Batedor', arcane_mage: 'Pinguim Mago', elder_druid: 'Pinguim Druida', necromancer: 'Pinguim Necromante', shadow_wraith: 'Pinguim Mestre das Sombras', wandering_demon: 'Pinguim Xamã', glacier_guardian: 'Pinguim Guardião Glacial', tundra_duelist: 'Pinguim Duelista', icebreaker: 'Pinguim Quebra-Gelo', sacrifice_knight: 'Pinguim Paladino', ice_scout: 'Pinguim Arqueiro Aprendiz', aurora_sniper: 'Pinguim Mestre Arqueiro', moss_hunter: 'Pinguim Caçador do Musgo', frost_sage: 'Pinguim Mago de Gelo', mirror_mage: 'Pinguim Maga do Espelho', healing_seer: 'Pinguim Vidente', frost_witch: 'Pinguim Alquimista da Geada', storm_imp: 'Pinguim Monge da Tempestade' };
 const PLAYER_CLASSES: Record<string, CreatureClass> = { orc_warrior: 'warrior', iron_knight: 'paladin', berserker: 'berserker', stone_golem: 'guardian', elven_archer: 'archer', goblin_hunter: 'rogue', forest_scout: 'archer', arcane_mage: 'mage', elder_druid: 'druid', necromancer: 'necromancer', shadow_wraith: 'rogue', wandering_demon: 'shaman', glacier_guardian: 'guardian', tundra_duelist: 'samurai', icebreaker: 'warrior', sacrifice_knight: 'paladin', ice_scout: 'archer', aurora_sniper: 'archer', moss_hunter: 'archer', frost_sage: 'mage', mirror_mage: 'mage', healing_seer: 'support', frost_witch: 'alchemist', storm_imp: 'monk' };
 const PLAYER_CARDS = new Set(CARDS.filter(card => card.category === 'monster').map(card => card.id));
@@ -73,6 +76,7 @@ export const ENEMY_CARDS: MonsterCard[] = [
   enemyMonster('enemy_salamander', 'Salamandra', 'elemental', 'chaos', 3, 6, 'chaos', 4), enemyMonster('enemy_fire_elemental', 'Elemental de Fogo', 'elemental', 'chaos', 4, 8, 'magic', 5), enemyMonster('enemy_demon', 'Demônio Guerreiro', 'demon', 'chaos', 5, 10, 'chaos', 5, [ability('enrage', 'Fúria', 'Aumenta dano com pouca vida.', 2)]), enemyMonster('enemy_volcanic_dragon', 'Dragão Vulcânico', 'dragon', 'chaos', 8, 18, 'chaos', 7, [ability('doubleStrike', 'Rajada ígnea', 'Ataca duas vezes.', 1)], 'legendary'),
   enemyMonster('enemy_arcane_construct', 'Construto Arcano', 'golem', 'balance', 4, 10, 'magic', 3, [ability('reflect', 'Reflexo rúnico', 'Reflete magia.', 1)]), enemyMonster('enemy_rune_guardian', 'Guardião Rúnico', 'elemental', 'balance', 5, 12, 'magic', 4, [ability('barrier', 'Runas defensivas', 'Absorve dano.', 2)]), enemyMonster('enemy_void_guardian', 'Guardião do Caos', 'demon', 'chaos', 7, 16, 'chaos', 6, [ability('stun', 'Pavor', 'Pode atordoar.', 1)], 'legendary')
 ];
+ENEMY_CARDS.push(...EXPANSION_ENEMY_CARDS.filter((card): card is MonsterCard => card.category === 'monster'));
 export const ENEMY_DECKS: DeckList[] = [
   { id: 'enemy-forest', name: 'Inimigos da Floresta', cards: ['enemy_goblin_warrior','enemy_goblin_archer','enemy_wolf','enemy_ent','enemy_goblin_warrior','enemy_goblin_archer','enemy_wolf','enemy_ent','minor_heal','iron_sword','reinforced_bow','battle_blessing','minor_heal','iron_shield','reinforced_bow','battle_blessing'] },
   { id: 'enemy-mountains', name: 'Inimigos das Montanhas', cards: ['enemy_orc','enemy_troll','enemy_stone_golem','enemy_iron_colossus','enemy_orc','enemy_troll','enemy_stone_golem','enemy_iron_colossus','iron_shield','runic_armor','war_axe','magic_barrier','iron_shield','runic_armor','war_axe','magic_barrier'] },

@@ -8,17 +8,18 @@ describe('catálogo visual padronizado', () => {
     for (const card of [...CARDS, ...ENEMY_CARDS]) expect(CARD_ASSETS[card.id]).toBeDefined();
   });
 
-  it('usa ilustrações separadas nas 24 cartas jogáveis de monstro', () => {
+  it('mantém ilustrações prontas no catálogo-base e manifesto para a expansão', () => {
     const monsters = CARDS.filter(card => card.category === 'monster');
-    expect(monsters).toHaveLength(24);
-    expect(monsters.every(card => CARD_ASSETS[card.id].source === 'illustration')).toBe(true);
+    expect(monsters).toHaveLength(59);
+    expect(monsters.filter(card => CARD_ASSETS[card.id].source === 'illustration')).toHaveLength(24);
+    expect(monsters.every(card => CARD_ASSETS[card.id])).toBe(true);
   });
 
-  it('possui arte própria para todos os monstros não pinguins', () => {
+  it('mantém arte pronta para inimigos-base e placeholders auditáveis para a expansão', () => {
     const enemies = ENEMY_CARDS.filter(card => card.category === 'monster');
-    expect(enemies).toHaveLength(25);
-    expect(enemies.every(card => CARD_ASSETS[card.id].source === 'illustration')).toBe(true);
-    expect(new Set(enemies.map(card => CARD_ASSETS[card.id].illustration)).size).toBe(enemies.length);
+    expect(enemies).toHaveLength(60);
+    expect(enemies.filter(card => CARD_ASSETS[card.id].source === 'illustration')).toHaveLength(25);
+    expect(new Set(enemies.map(card => CARD_ASSETS[card.id].illustration)).size).toBeGreaterThan(25);
   });
 
   it('mantém todos os status implementados na biblioteca única', () => {

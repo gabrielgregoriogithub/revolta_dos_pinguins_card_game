@@ -1,4 +1,5 @@
 import type { BattleEnvironment, CampaignBattle, CampaignNode, CampaignRegion } from '../types';
+import { EXPANSION_CARDS } from './expansion';
 
 type WorldSpec = { id: string; name: string; theme: string; enemyStyle: string; boss: string; biome: BattleEnvironment['biomeId']; stages: string[]; arenas: string[]; deck: string; rewards: string[] };
 
@@ -36,7 +37,10 @@ const worlds: WorldSpec[] = [
 ];
 
 export const BATTLE_ENVIRONMENTS: Record<string, BattleEnvironment> = { ...baseEnvironments };
-const rewardPool = worlds.flatMap(world => world.rewards);
+// Recompensas antigas permanecem válidas; a expansão entra progressivamente no
+// mesmo sorteio determinístico da campanha, sem alterar saves já concluídos.
+const expansionRewardPool = EXPANSION_CARDS.filter(card => card.category !== 'monster' || card.rarity !== 'legendary').map(card => card.id);
+const rewardPool = [...worlds.flatMap(world => world.rewards), ...expansionRewardPool];
 const environmentFor = (world: WorldSpec, stage: number) => world.arenas[Math.min(stage, world.arenas.length - 1)] ?? 'forest-clearing';
 const makeBattle = (world: WorldSpec, index: number): CampaignBattle => ({ id: `${world.id}-${index + 1}`, regionId: world.id, name: world.stages[index], kind: index === 4 || index === 8 ? 'boss' : index === 5 || index === 6 ? 'elite' : 'normal', difficulty: world.id === 'forest' && index < 3 ? 'easy' : index < 3 ? 'normal' : index >= 7 ? 'hard' : 'normal', enemyDeckId: world.deck, enemyName: index === 4 || index === 8 ? world.boss : world.enemyStyle, description: index === 4 || index === 8 ? `${world.boss} guarda uma passagem importante.` : `Explore ${world.name.toLowerCase()} e aprenda sobre ${world.theme}.`, reward: { gold: 20 + index * 12 + (index === 4 || index === 8 ? 60 : 0), shards: index === 0 ? 0 : index >= 4 ? 2 : 1, cardId: rewardPool[(worlds.indexOf(world) * 3 + index) % rewardPool.length] }, environmentId: environmentFor(world, index), worldIndex: worlds.indexOf(world) + 1, stageIndex: index + 1, optional: index >= 5 });
 export const CAMPAIGN_REGIONS: CampaignRegion[] = worlds.map((world, wi) => ({ id: world.id, name: world.name, theme: world.theme, enemyStyle: world.enemyStyle, description: `Mundo ${wi + 1}: ${world.name}. Avance por trilhas, descubra atalhos e enfrente ${world.enemyStyle.toLowerCase()}.`, battles: world.stages.slice(0, 9).map((_, i) => makeBattle(world, i)), worldIndex: wi + 1, mapBackgroundId: `world-${String(wi + 1).padStart(2, '0')}` }));

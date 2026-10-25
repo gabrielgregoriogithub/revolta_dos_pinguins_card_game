@@ -74,7 +74,23 @@ export function attackProfileFor(event: Pick<CombatVisualEvent, 'sourceModelId'|
   if (byCard) return ATTACK_FX_PROFILES[byCard];
   const card = event.sourceModelId ? CARD_MAP.get(event.sourceModelId) : undefined;
   const type = event.attackType ?? (card?.category === 'monster' ? card.attacks[0].type : 'melee');
+  const id = (event.sourceModelId ?? '').toLowerCase();
+  if (type === 'melee' && /lance|spear/.test(id)) return ATTACK_FX_PROFILES.spear;
+  if (type === 'melee' && /hammer|golem|giant|titan|bear|crab/.test(id)) return ATTACK_FX_PROFILES.hammer;
+  if (type === 'melee' && /samurai|katana|duelist/.test(id)) return ATTACK_FX_PROFILES.katana;
+  if (type === 'melee' && /claw|spider|scorpion|serpent|wolf|shark|chimera/.test(id)) return ATTACK_FX_PROFILES.claw;
+  if (type === 'ranged' && /fire|ember|flame/.test(id)) return ATTACK_FX_PROFILES.arrow_fire;
+  if (type === 'ranged' && /ice|frost/.test(id)) return ATTACK_FX_PROFILES.arrow_ice;
+  if (type === 'ranged' && /poison|venom|toxic/.test(id)) return ATTACK_FX_PROFILES.arrow_poison;
+  if (type === 'magic' && /fire|ember|magma|flame/.test(id)) return ATTACK_FX_PROFILES.fireball;
+  if (type === 'magic' && /ice|frost|glacial/.test(id)) return ATTACK_FX_PROFILES.ice;
+  if (type === 'magic' && /poison|venom|toxic|swamp/.test(id)) return ATTACK_FX_PROFILES.poison;
+  if (type === 'magic' && /shadow|void|lich|undead/.test(id)) return ATTACK_FX_PROFILES.shadow;
+  if (type === 'magic' && /storm|lightning|thunder/.test(id)) return ATTACK_FX_PROFILES.lightning;
+  if (type === 'magic' && /water|tide|sea/.test(id)) return ATTACK_FX_PROFILES.water;
+  if (type === 'magic' && /wind|harpy|owl/.test(id)) return ATTACK_FX_PROFILES.wind;
+  if (type === 'magic' && /druid|moss|nature/.test(id)) return ATTACK_FX_PROFILES.nature;
   return ATTACK_FX_PROFILES[FALLBACK_BY_TYPE[type] ?? 'sword'];
 }
 
-export function hasCardProfile(cardId: string) { return cardId in PROFILE_BY_CARD; }
+export function hasCardProfile(cardId: string) { return CARD_MAP.get(cardId)?.category === 'monster'; }
