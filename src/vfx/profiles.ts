@@ -2,16 +2,26 @@ import type { AttackType, CombatVisualEvent } from '../types';
 import { CARD_MAP } from '../data/cards';
 
 export type FXIntensity = 'light' | 'medium' | 'heavy' | 'ultimate';
-export type FxElement = 'physical' | 'fire' | 'ice' | 'lightning' | 'poison' | 'shadow' | 'nature' | 'light' | 'arcane' | 'chaos';
+export type FxElement = 'physical' | 'fire' | 'ice' | 'lightning' | 'poison' | 'shadow' | 'nature' | 'light' | 'arcane' | 'chaos' | 'water' | 'wind';
 // Como o golpe se move: corpo a corpo (slash…fist) ou projétil/feixe (projectile, bolt, breath).
 export type FxMotion = 'slash' | 'heavy' | 'quick' | 'thrust' | 'smash' | 'claw' | 'bite' | 'fist' | 'projectile' | 'bolt' | 'breath';
-export type FxProjectile = 'arrow' | 'orb' | 'shard' | 'leaf' | 'skull' | 'spark' | 'vortex' | 'breath';
+export type FxProjectile = 'arrow' | 'orb' | 'shard' | 'leaf' | 'skull' | 'spark' | 'vortex' | 'breath' | 'wave' | 'gust';
 export interface AttackFXProfile { id: string; attackType: AttackType | string; weapon?: string; element: FxElement; motion: FxMotion; projectile?: FxProjectile; windupEffect: string; travelEffect?: string; impactEffect: string; windupSound: string; releaseSound: string; impactSound: string; hitStopMs: number; shakeIntensity: number; visualIntensity: FXIntensity; }
 
 const melee = (id: string, weapon: string, motion: FxMotion, hitStopMs: number, shakeIntensity: number, visualIntensity: FXIntensity, sound = id): AttackFXProfile =>
   ({ id, attackType: 'melee', weapon, element: 'physical', motion, windupEffect: `${id}-windup`, impactEffect: `${id}-impact`, windupSound: `${sound}-windup`, releaseSound: `${sound}-swish`, impactSound: `${sound}-hit`, hitStopMs, shakeIntensity, visualIntensity });
-const ranged = (id: string, element: FxElement, impactSound: string): AttackFXProfile =>
-  ({ id, attackType: 'ranged', weapon: 'bow', element, motion: 'projectile', projectile: 'arrow', windupEffect: 'charge-bow', travelEffect: `${id}-trail`, impactEffect: `${id}-impact`, windupSound: 'bow-draw', releaseSound: 'arrow-release', impactSound, hitStopMs: 34, shakeIntensity: .08, visualIntensity: 'medium' });
+const rangedSounds: Partial<Record<FxElement, [windup: string, release: string]>> = {
+  physical: ['bow-draw', 'arrow-release'],
+  fire: ['fire-charge', 'fire-release'],
+  ice: ['ice-charge', 'ice-release'],
+  lightning: ['lightning-charge', 'lightning-release'],
+  poison: ['poison-charge', 'poison-release'],
+  light: ['light-charge', 'light-release'],
+};
+const ranged = (id: string, element: FxElement, impactSound: string): AttackFXProfile => {
+  const [windupSound, releaseSound] = rangedSounds[element] ?? ['bow-draw', 'arrow-release'];
+  return { id, attackType: 'ranged', weapon: 'bow', element, motion: 'projectile', projectile: 'arrow', windupEffect: 'charge-bow', travelEffect: `${id}-trail`, impactEffect: `${id}-impact`, windupSound, releaseSound, impactSound, hitStopMs: 34, shakeIntensity: .08, visualIntensity: 'medium' };
+};
 const spell = (id: string, attackType: AttackType, element: FxElement, motion: FxMotion, projectile: FxProjectile, hitStopMs: number, shakeIntensity: number, visualIntensity: FXIntensity, sound = id): AttackFXProfile =>
   ({ id, attackType, element, motion, projectile, windupEffect: `${sound}-charge`, travelEffect: `${sound}-trail`, impactEffect: `${sound}-impact`, windupSound: `${sound}-charge`, releaseSound: `${sound}-release`, impactSound: `${sound}-impact`, hitStopMs, shakeIntensity, visualIntensity });
 
@@ -25,9 +35,11 @@ export const ATTACK_FX_PROFILES: Record<string, AttackFXProfile> = {
   claw: melee('claw', 'claws', 'claw', 44, .14, 'medium'),
   bite: melee('bite', 'fangs', 'bite', 50, .16, 'medium'),
   arrow: ranged('arrow', 'physical', 'arrow-hit'),
+  arrow_fire: ranged('arrow_fire', 'fire', 'fire-impact'),
   arrow_ice: ranged('arrow_ice', 'ice', 'ice-impact'),
   arrow_poison: ranged('arrow_poison', 'poison', 'poison-impact'),
   arrow_light: ranged('arrow_light', 'light', 'light-impact'),
+  arrow_lightning: ranged('arrow_lightning', 'lightning', 'lightning-impact'),
   fireball: spell('fireball', 'magic', 'fire', 'projectile', 'orb', 76, .24, 'heavy', 'fire'),
   ice: spell('ice', 'magic', 'ice', 'projectile', 'shard', 58, .16, 'medium'),
   nature: spell('nature', 'magic', 'nature', 'projectile', 'leaf', 48, .1, 'medium'),
@@ -35,6 +47,8 @@ export const ATTACK_FX_PROFILES: Record<string, AttackFXProfile> = {
   poison: spell('poison', 'magic', 'poison', 'projectile', 'orb', 48, .12, 'medium'),
   arcane: spell('arcane', 'magic', 'arcane', 'projectile', 'orb', 54, .14, 'medium'),
   light: spell('light', 'magic', 'light', 'projectile', 'spark', 54, .14, 'medium'),
+  water: spell('water', 'magic', 'water', 'projectile', 'wave', 56, .15, 'medium', 'water'),
+  wind: spell('wind', 'magic', 'wind', 'projectile', 'gust', 48, .12, 'medium', 'wind'),
   lightning: spell('lightning', 'chaos', 'lightning', 'bolt', 'spark', 66, .2, 'heavy'),
   chaos: spell('chaos', 'chaos', 'chaos', 'projectile', 'vortex', 70, .2, 'heavy'),
   dragon_fire: spell('dragon_fire', 'chaos', 'fire', 'breath', 'breath', 110, .45, 'ultimate', 'breath'),

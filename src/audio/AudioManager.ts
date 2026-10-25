@@ -27,6 +27,8 @@ export const SOUNDS: Record<string, Layer[]> = {
   'poison-charge': [t(260, 180, 'sine', .12, .3)], 'poison-release': [n(900, .14, .2)], 'poison-impact': [n(600, .18, .3), ...bubbles(400, .05)],
   'arcane-charge': [t(440, 880, 'sine', .13, .28)], 'arcane-release': [n(2600, .14, .14)], 'arcane-impact': [t(660, 220, 'triangle', .2, .2), t(990, 330, 'sine', .1, .18)],
   'light-charge': [t(660, 1320, 'sine', .12, .3)], 'light-release': [n(4000, .1, .12)], 'light-impact': [t(1320, null, 'sine', .14, .35), t(1760, null, 'sine', .1, .35, .05)],
+  'water-charge': [t(180, 620, 'sine', .12, .28), n(900, .06, .2)], 'water-release': [n(1200, .14, .16)], 'water-impact': [n(420, .18, .24), t(260, 110, 'sine', .1, .2)],
+  'wind-charge': [n(700, .1, .28), t(260, 520, 'triangle', .08, .25)], 'wind-release': [n(2600, .18, .16)], 'wind-impact': [n(1800, .14, .18), t(400, 160, 'sine', .08, .2)],
   'lightning-charge': [n(5000, .12, .3), t(120, 900, 'sawtooth', .1, .3)], 'lightning-release': [n(3800, .28, .12)], 'lightning-impact': [n(2500, .3, .2), t(80, 40, 'square', .2, .18)],
   'chaos-charge': [t(180, 720, 'sawtooth', .15, .3)], 'chaos-release': [n(1400, .2, .2)], 'chaos-impact': [t(100, 45, 'square', .24, .24), t(560, 180, 'sawtooth', .13, .16)],
   'breath-charge': [t(60, 140, 'sawtooth', .2, .45), n(400, .14, .4)], 'breath-release': [n(700, .3, .5)], 'breath-impact': [t(50, 28, 'square', .32, .4), n(350, .3, .4)],
@@ -40,7 +42,7 @@ export const SOUNDS: Record<string, Layer[]> = {
   summon: [t(300, 680, 'sine', .15, .3)], equip: [n(1300, .14, .12)],
   'death-physical': [t(110, 38, 'sawtooth', .18, .4), n(500, .2, .3)], 'death-fire': [n(900, .25, .5), t(90, 40, 'sawtooth', .14, .5)],
   'death-ice': [t(2000, 800, 'triangle', .16, .2), t(2400, 900, 'triangle', .12, .2, .08), t(1800, 700, 'triangle', .1, .2, .16), n(5000, .18, .3)],
-  'death-lightning': [n(3500, .3, .3), t(200, 60, 'square', .16, .3)], 'death-poison': [t(200, 80, 'sine', .16, .6), ...bubbles(260, .1)],
+  'death-lightning': [n(3500, .3, .3), t(200, 60, 'square', .16, .3)], 'death-poison': [t(200, 80, 'sine', .16, .6), ...bubbles(260, .1)], 'death-water': [n(500, .18, .34), t(260, 90, 'sine', .1, .3)], 'death-wind': [n(1900, .14, .35), t(360, 120, 'triangle', .08, .3)],
   'death-shadow': [t(80, 30, 'sawtooth', .2, .7), t(160, 60, 'sine', .1, .7)], 'death-nature': [n(1200, .14, .4), t(300, 150, 'sine', .12, .4)],
   'death-light': [t(1200, 300, 'sine', .14, .5)], 'death-arcane': [t(1200, 300, 'sine', .14, .5)], 'death-chaos': [t(120, 40, 'sawtooth', .18, .5), t(700, 200, 'sawtooth', .1, .4)],
 };
@@ -57,6 +59,7 @@ class AudioManager {
   private settings: AudioSettings = this.load();
   private lastEvent = '';
   private recentVoices: number[] = [];
+  private cueTimers = new Set<number>();
   private load(): AudioSettings { try { return { ...DEFAULTS, ...JSON.parse(localStorage.getItem('pinguins-audio') ?? '{}') }; } catch { return DEFAULTS; } }
   private save() { try { localStorage.setItem('pinguins-audio', JSON.stringify(this.settings)); } catch { /* storage is optional */ } }
   private getContext() { if (!this.context) this.context = new AudioContext(); if (this.context.state === 'suspended') void this.context.resume(); return this.context; }
@@ -66,6 +69,7 @@ class AudioManager {
   setEffects(volume: number) { this.settings.effects = Math.max(0, Math.min(1, volume)); this.save(); }
   // Limita o volume quando muitos sons disparam juntos (ataques múltiplos), evitando ruído acumulado.
   private voiceGain() { const now = performance.now(); this.recentVoices = this.recentVoices.filter(at => now - at < VOICE_WINDOW_MS); this.recentVoices.push(now); return 1 / (1 + .35 * (this.recentVoices.length - 1)); }
+  private clearQueuedCues() { for (const timer of this.cueTimers) window.clearTimeout(timer); this.cueTimers.clear(); }
   private layer(c: AudioContext, layer: Layer, pitch: number, gainScale: number) {
     const start = c.currentTime + (layer.delay ?? 0); const volume = Math.max(.0001, layer.volume * gainScale * this.settings.master * this.settings.effects); const gain = c.createGain();
     if ('tone' in layer) {
@@ -91,8 +95,17 @@ class AudioManager {
   stopAmbient() { if (this.ambientTimer !== null) { window.clearInterval(this.ambientTimer); this.ambientTimer = null; } }
   // Toca as deixas sonoras planejadas pela coreografia, no mesmo ritmo da animação (escalado pela velocidade).
   playVisualEvent(event: CombatVisualEvent, speedFactor = 1) {
-    if (!event || event.id === this.lastEvent || speedFactor === 0) return; this.lastEvent = event.id;
-    for (const cue of event.fx?.sounds ?? []) { if (cue.atMs === 0) this.play(cue.id); else window.setTimeout(() => this.play(cue.id), cue.atMs * speedFactor); }
+    if (!event) return;
+    if (speedFactor === 0) { this.clearQueuedCues(); return; }
+    if (event.id === this.lastEvent) return;
+    this.clearQueuedCues(); this.lastEvent = event.id;
+    for (const cue of event.fx?.sounds ?? []) {
+      if (cue.atMs === 0) this.play(cue.id);
+      else {
+        const timer = window.setTimeout(() => { this.cueTimers.delete(timer); this.play(cue.id); }, cue.atMs * speedFactor);
+        this.cueTimers.add(timer);
+      }
+    }
   }
 }
 export const audioManager = new AudioManager();

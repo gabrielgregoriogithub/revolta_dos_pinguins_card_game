@@ -38,7 +38,7 @@ const STATUS_POPUP: Record<string, (v: number) => Popup> = {
   attackBuff: v => ({ value: `🔥 +${v}`, label: 'Ataque', tone: 'buff' }),
   cleanse: () => ({ value: '✨', label: 'Purificado', tone: 'heal' }),
 };
-const NUMBER_LABEL: Record<string, string> = { physical: 'Golpe', fire: 'Fogo', ice: 'Gelo', lightning: 'Raio', poison: 'Veneno', shadow: 'Sombra', nature: 'Natureza', light: 'Luz', arcane: 'Arcano', chaos: 'Caos', thorns: 'Espinhos · contra-ataque', reflect: 'Reflexo', drain: 'Roubo de vida', heal: 'Cura' };
+const NUMBER_LABEL: Record<string, string> = { physical: 'Golpe', fire: 'Fogo', ice: 'Gelo', lightning: 'Raio', poison: 'Veneno', shadow: 'Sombra', nature: 'Natureza', light: 'Luz', arcane: 'Arcano', chaos: 'Caos', water: 'Água', wind: 'Vento', thorns: 'Espinhos · contra-ataque', reflect: 'Reflexo', drain: 'Roubo de vida', heal: 'Cura' };
 
 export function popupFor(event: CombatVisualEvent | undefined, id: string): Popup | null {
   if (!event || event.targetCardInstanceId !== id) return null;
@@ -125,11 +125,12 @@ export function AttackFx({ event, arenaRef, quality = 'high', speed = 'normal' }
     {fx.motion === 'bolt' && <svg className="bolt-path" style={{ left: geo.x1, top: geo.y1 }}><polyline className="glow" points={boltPoints(len, event.sequence)} /><polyline points={boltPoints(len, event.sequence)} /></svg>}
     {fx.motion === 'breath' && <span className="breath-cone"><i /><i /><i /></span>}
     {fx.motion === 'projectile' && <span className={`projectile shape-${projectileShape(fx.profileId)}`}><i /><b /><em /></span>}
+    {fx.motion === 'smash' && <span className="ground-shock" />}
     {melee && <span className={`melee-swipe motion-${fx.motion}`}>{Array.from({ length: SWIPE_PARTS[fx.motion] ?? 1 }, (_, i) => <i key={i} />)}</span>}
   </div>;
 }
 
-const projectileShape = (profileId: string) => profileId.startsWith('arrow') ? 'arrow' : profileId === 'ice' ? 'shard' : profileId === 'nature' ? 'leaf' : profileId === 'shadow' ? 'skull' : profileId === 'chaos' ? 'vortex' : profileId === 'light' ? 'spark' : 'orb';
+const projectileShape = (profileId: string) => profileId.startsWith('arrow') ? 'arrow' : profileId === 'ice' ? 'shard' : profileId === 'nature' ? 'leaf' : profileId === 'shadow' ? 'skull' : profileId === 'chaos' ? 'vortex' : profileId === 'light' ? 'spark' : profileId === 'water' ? 'wave' : profileId === 'wind' ? 'gust' : 'orb';
 // Raio em zigue-zague determinístico ao longo do eixo do ataque (rotacionado por CSS).
 function boltPoints(length: number, seed: number) {
   const steps = 7; return Array.from({ length: steps + 1 }, (_, i) => { const jitter = i === 0 || i === steps ? 0 : (Math.abs(Math.sin(seed * 7.1 + i * 3.7)) * 2 - 1) * 16; return `${Math.round(length * i / steps)},${Math.round(jitter)}`; }).join(' ');

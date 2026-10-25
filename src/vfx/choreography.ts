@@ -30,7 +30,7 @@ const LINK_TRAVEL_MS: Record<FxLink['kind'], number> = { reflect: 320, thorns: 2
 const BASE_MS: Record<VisualEventType, number> = { ATTACK: 600, DAMAGE: 760, BLOCK: 760, MISS: 680, HEAL: 700, STATUS: 680, DEATH: 960, SUMMON: 900, EQUIP: 760, EFFECT: 900, FORMATION: 600, START: 900, END: 450 };
 const SLASH_ANGLES = [-32, 28, -8];
 const HEAVY_MOTIONS: FxMotion[] = ['heavy', 'smash'];
-const SPELL_ELEMENT: Record<string, FxElement> = { fireball: 'fire', crystal_burst: 'ice' };
+const SPELL_ELEMENT: Record<string, FxElement> = { fireball: 'fire', crystal_burst: 'ice', water_burst: 'water', wind_burst: 'wind' };
 const DAMAGE_ELEMENT: Record<string, FxElement> = { poison: 'poison', thorns: 'nature', reflected: 'arcane' };
 
 const isHit = (e: CombatVisualEvent | undefined) => e?.type === 'DAMAGE' || e?.type === 'BLOCK';
