@@ -26,7 +26,9 @@ import { STATUS_DESCRIPTIONS } from '../data/statusVisuals';
 const loadDecks = (): DeckList[] => { try { const raw = localStorage.getItem('pinguins-decks'); const saved: DeckList[] = raw ? JSON.parse(raw) : []; const ids = new Set(saved.map(d => d.id)); return [...STARTER_DECKS.filter(d => !ids.has(d.id)), ...saved]; } catch { return STARTER_DECKS; } };
 const saveDecks = (decks: DeckList[]) => localStorage.setItem('pinguins-decks', JSON.stringify(decks));
 const isMeleeMonster = (id: string) => { const card = getCard(id); return card.category === 'monster' && card.attacks[0].type === 'melee'; };
-const STAGE_LANDSCAPE = { width: 1600, height: 900 }; const STAGE_PORTRAIT = { width: 900, height: 1600 };
+const STAGE_LANDSCAPE = { width: 1600, height: 900 };
+// Palco portrait mais compacto para manter cartas e controles legíveis em 320–430px.
+const STAGE_PORTRAIT = { width: 680, height: 1200 };
 function useStageFit() { const measure = () => { const portrait = window.innerWidth < window.innerHeight * .85; const base = portrait ? STAGE_PORTRAIT : STAGE_LANDSCAPE; return { ...base, portrait, scale: Math.min(window.innerWidth / base.width, window.innerHeight / base.height) }; }; const [fit, setFit] = useState(measure); useEffect(() => { const onResize = () => setFit(measure()); window.addEventListener('resize', onResize); return () => window.removeEventListener('resize', onResize); }, []); return fit; }
 type Playback = { visual: GameState; actual: GameState; events: ReturnType<typeof buildVisualEvents>; index: number; paused: boolean; };
 

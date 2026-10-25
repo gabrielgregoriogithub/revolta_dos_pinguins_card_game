@@ -162,6 +162,7 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 
 /* ---- Palco da batalha: resolução fixa escalada para caber inteira na janela ---- */
 .stage-viewport{position:fixed;inset:0;overflow:hidden}
+.stage-viewport{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left)}
 .stage{position:absolute;left:50%;top:50%;transform-origin:50% 50%;display:grid;gap:0 16px;padding:10px 18px 0;overflow:hidden;max-width:none;margin:0}
 .stage.landscape{grid-template-columns:minmax(0,1fr) 320px;grid-template-rows:44px minmax(0,1fr)}
 .stage.portrait{grid-template-columns:minmax(0,1fr);grid-template-rows:44px minmax(0,1fr) 300px}
@@ -203,6 +204,7 @@ button:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .inline-error{color:#ffacb2}
 .stage.portrait .command-row{flex-wrap:wrap}
 .stage.portrait .command-row .selection-preview{flex-basis:100%;order:-1}
+@media(max-width:520px){.stage.portrait .topbar{gap:5px}.stage.portrait .topbar .turn{font-size:11px;letter-spacing:1px}.stage.portrait .top-controls{gap:4px}.stage.portrait .top-controls span{display:none}.stage.portrait .top-controls button{padding:6px 8px;font-size:11px}.stage.portrait .command-row{gap:5px}.stage.portrait .command-row button{padding:8px 7px;font-size:11px}.stage.portrait .hand-fan{top:10px}.stage.portrait .fan-slot{margin:0 -28px}.stage.portrait .fan-slot:hover,.stage.portrait .fan-slot.selected{margin:0 4px}}
 
 /* mão em leque, como se estivesse segurando as cartas */
 .hand{position:relative;z-index:12;border-top:0;padding:0;min-height:0}

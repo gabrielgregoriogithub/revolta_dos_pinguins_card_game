@@ -79,3 +79,6 @@ body>.status-popover.side-bottom:after{top:-5px;bottom:auto;transform:translateX
 .card .card-kind{bottom:5cqw}.card[data-category="equipment"] .equipment-hint{bottom:17cqw}
 .campaign-next{display:flex;flex-direction:column;gap:8px;margin-top:14px;padding-top:14px;border-top:1px solid #f6ce6555}.campaign-next b{color:#f6ce65;text-align:center}
 .story-deck .collection-card button.collection-action{margin-top:4px}
+
+/* Raridade adicionada na expansão: verde para manter a hierarquia visual. */
+.card[data-rarity="uncommon"]{--rarity:linear-gradient(135deg,#c8f3d2,#3b9b61);--rarity-ink:#21663d}
